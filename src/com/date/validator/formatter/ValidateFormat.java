@@ -1,5 +1,5 @@
 package com.date.validator.formatter;
 
-public interface VFInterface {
+public interface ValidateFormat {
 	String formatDate();
 }
