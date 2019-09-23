@@ -57,13 +57,14 @@ public class ValidatorFormatter implements ValidateFormat {
 		String[] yearFormats = { "yy", "yyyy" };
 		String[] dayFormats = { "dd" };
 
+		StringBuilder sbDateFormatNonDelimiter = new StringBuilder();
 		StringBuilder sbDateNonDelimiter = new StringBuilder();
 
 		inputDateFormat = inputDateFormat.toUpperCase();
 		System.out.println(inputDateFormat);
 		try {
 
-			// Convert to non delimited format
+			// Convert to non delimited date format
 			char delimiter;
 			for (int i = 0; i < inputDateFormat.length(); i++) {
 				if (inputDateFormat.charAt(i) != 'D' && inputDateFormat.charAt(i) != 'M'
@@ -71,79 +72,62 @@ public class ValidatorFormatter implements ValidateFormat {
 					delimiter = inputDateFormat.charAt(i);
 
 				} else {
-					sbDateNonDelimiter.append(inputDateFormat.charAt(i));
+					sbDateFormatNonDelimiter.append(inputDateFormat.charAt(i));
 				}
 			}
+
+			// Convert to non delimited date
+			for (int i = 0; i < inputDate.length(); i++) {
+				if (inputDate.charAt(i) == '.' || inputDate.charAt(i) == '/') {
+					delimiter = inputDate.charAt(i);
+
+				} else {
+					sbDateNonDelimiter.append(inputDate.charAt(i));
+				}
+			}
+
+			System.out.println(sbDateFormatNonDelimiter);
 			System.out.println(sbDateNonDelimiter);
 
+			String dateFormatNonDelimiter = sbDateFormatNonDelimiter.toString();
 			String dateNonDelimiter = sbDateNonDelimiter.toString();
-
 			String inputDay;
 			String inputMonth;
 			String inputYear;
 
-			// Select the input format and separate day month year
-			if (dateNonDelimiter.equals("DDMMYY") || dateNonDelimiter.equals("DDYYMM")
-					|| dateNonDelimiter.equals("MMDDYY") || dateNonDelimiter.equals("MMYYDD")
-					|| dateNonDelimiter.equals("YYDDMM") || dateNonDelimiter.equals("YYMMDD")) {
+			// Select the DDMMYY variants and verify validity
+			if (dateFormatNonDelimiter.equals("DDMMYY") || dateFormatNonDelimiter.equals("DDYYMM")
+					|| dateFormatNonDelimiter.equals("MMDDYY") || dateFormatNonDelimiter.equals("MMYYDD")
+					|| dateFormatNonDelimiter.equals("YYDDMM") || dateFormatNonDelimiter.equals("YYMMDD")) {
 				try {
-					if (inputDate.length() != 8 && inputDate.length() != 6)
+					if (inputDate.length() != 6)
 						throw new Exception("Error: Date is invalid. Invalid length for the input date.");
 					else {
-						if (inputDate.length() == 8) {
-							if (dateNonDelimiter.equals("DDMMYY")) {
-								inputDay = inputDate.substring(0, 2);
-								inputMonth = inputDate.substring(3, 5);
-								inputYear = inputDate.substring(6, 8);
-							} else if (dateNonDelimiter.equals("DDYYMM")) {
-								inputDay = inputDate.substring(0, 2);
-								inputYear = inputDate.substring(3, 5);
-								inputMonth = inputDate.substring(6, 8);
-							} else if (dateNonDelimiter.equals("MMDDYY")) {
-								inputMonth = inputDate.substring(0, 2);
-								inputDay = inputDate.substring(3, 5);
-								inputYear = inputDate.substring(6, 8);
-							} else if (dateNonDelimiter.equals("MMYYDD")) {
-								inputMonth = inputDate.substring(0, 2);
-								inputYear = inputDate.substring(3, 5);
-								inputDay = inputDate.substring(6, 8);
-							} else if (dateNonDelimiter.equals("YYDDMM")) {
-								inputYear = inputDate.substring(0, 2);
-								inputDay = inputDate.substring(3, 5);
-								inputMonth = inputDate.substring(6, 8);
-							} else {
-								inputYear = inputDate.substring(0, 2);
-								inputMonth = inputDate.substring(3, 5);
-								inputDay = inputDate.substring(6, 8);
-							}
 
-							System.out.println(inputDay + " " + inputMonth + " " + inputYear);
+						if (dateFormatNonDelimiter.equals("DDMMYY")) {
+							inputDay = dateNonDelimiter.substring(0, 2);
+							inputMonth = dateNonDelimiter.substring(2, 4);
+							inputYear = dateNonDelimiter.substring(4, 6);
+						} else if (dateFormatNonDelimiter.equals("DDYYMM")) {
+							inputDay = dateNonDelimiter.substring(0, 2);
+							inputYear = dateNonDelimiter.substring(2, 4);
+							inputMonth = dateNonDelimiter.substring(4, 6);
+						} else if (dateFormatNonDelimiter.equals("MMDDYY")) {
+							inputMonth = dateNonDelimiter.substring(0, 2);
+							inputDay = dateNonDelimiter.substring(2, 4);
+							inputYear = dateNonDelimiter.substring(4, 6);
+						} else if (dateFormatNonDelimiter.equals("MMYYDD")) {
+							inputMonth = dateNonDelimiter.substring(0, 2);
+							inputYear = dateNonDelimiter.substring(2, 4);
+							inputDay = dateNonDelimiter.substring(4, 6);
+						} else if (dateFormatNonDelimiter.equals("YYDDMM")) {
+							inputYear = dateNonDelimiter.substring(0, 2);
+							inputDay = dateNonDelimiter.substring(2, 4);
+							inputMonth = dateNonDelimiter.substring(4, 6);
 						} else {
-							if (dateNonDelimiter.equals("DDMMYY")) {
-								inputDay = inputDate.substring(0, 2);
-								inputMonth = inputDate.substring(2, 4);
-								inputYear = inputDate.substring(4, 6);
-							} else if (dateNonDelimiter.equals("DDYYMM")) {
-								inputDay = inputDate.substring(0, 2);
-								inputYear = inputDate.substring(2, 4);
-								inputMonth = inputDate.substring(4, 6);
-							} else if (dateNonDelimiter.equals("MMDDYY")) {
-								inputMonth = inputDate.substring(0, 2);
-								inputDay = inputDate.substring(2, 4);
-								inputYear = inputDate.substring(4, 6);
-							} else if (dateNonDelimiter.equals("MMYYDD")) {
-								inputMonth = inputDate.substring(0, 2);
-								inputYear = inputDate.substring(2, 4);
-								inputDay = inputDate.substring(4, 6);
-							} else if (dateNonDelimiter.equals("YYDDMM")) {
-								inputYear = inputDate.substring(0, 2);
-								inputDay = inputDate.substring(2, 4);
-								inputMonth = inputDate.substring(4, 6);
-							} else {
-								inputYear = inputDate.substring(0, 2);
-								inputMonth = inputDate.substring(2, 4);
-								inputDay = inputDate.substring(4, 6);
-							}
+							inputYear = dateNonDelimiter.substring(0, 2);
+							inputMonth = dateNonDelimiter.substring(2, 4);
+							inputDay = dateNonDelimiter.substring(4, 6);
 						}
 
 						int ipDay = Integer.parseInt(inputDay);
@@ -166,70 +150,43 @@ public class ValidatorFormatter implements ValidateFormat {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-			} else if (dateNonDelimiter.equals("DDMMYYYY") || dateNonDelimiter.equals("DDYYYYMM")
-					|| dateNonDelimiter.equals("MMDDYYYY") || dateNonDelimiter.equals("MMYYYYDD")
-					|| dateNonDelimiter.equals("YYYYDDMM") || dateNonDelimiter.equals("YYYYMMDD")) {
+
+				// Select the DDMMYYYY variants and verify validity
+			} else if (dateFormatNonDelimiter.equals("DDMMYYYY") || dateFormatNonDelimiter.equals("DDYYYYMM")
+					|| dateFormatNonDelimiter.equals("MMDDYYYY") || dateFormatNonDelimiter.equals("MMYYYYDD")
+					|| dateFormatNonDelimiter.equals("YYYYDDMM") || dateFormatNonDelimiter.equals("YYYYMMDD")) {
 
 				try {
-					if (inputDate.length() != 10 && inputDate.length() != 8)
+					if (dateNonDelimiter.length() != 8)
 						throw new Exception("Error: Date is invalid. Invalid length for the input date.");
 					else {
-						if (inputDate.length() == 10) {
 
-							if (dateNonDelimiter.equals("DDMMYYYY")) {
-								inputDay = inputDate.substring(0, 2);
-								inputMonth = inputDate.substring(3, 5);
-								inputYear = inputDate.substring(6, 10);
-							} else if (dateNonDelimiter.equals("DDYYYYMM")) {
-								inputDay = inputDate.substring(0, 2);
-								inputYear = inputDate.substring(3, 7);
-								inputMonth = inputDate.substring(8, 10);
-							} else if (dateNonDelimiter.equals("MMDDYYYY")) {
-								inputMonth = inputDate.substring(0, 2);
-								inputDay = inputDate.substring(3, 5);
-								inputYear = inputDate.substring(6, 10);
-							} else if (dateNonDelimiter.equals("MMYYYYDD")) {
-								inputMonth = inputDate.substring(0, 2);
-								inputYear = inputDate.substring(3, 7);
-								inputDay = inputDate.substring(8, 10);
-							} else if (dateNonDelimiter.equals("YYYYDDMM")) {
-								inputYear = inputDate.substring(0, 4);
-								inputDay = inputDate.substring(5, 7);
-								inputMonth = inputDate.substring(8, 10);
-							} else {
-								inputYear = inputDate.substring(0, 4);
-								inputMonth = inputDate.substring(5, 7);
-								inputDay = inputDate.substring(8, 10);
-							}
-
+						if (dateFormatNonDelimiter.equals("DDMMYYYY")) {
+							inputDay = dateNonDelimiter.substring(0, 2);
+							inputMonth = dateNonDelimiter.substring(2, 4);
+							inputYear = dateNonDelimiter.substring(4, 8);
+						} else if (dateFormatNonDelimiter.equals("DDYYYYMM")) {
+							inputDay = dateNonDelimiter.substring(0, 2);
+							inputYear = dateNonDelimiter.substring(2, 6);
+							inputMonth = dateNonDelimiter.substring(6, 8);
+						} else if (dateFormatNonDelimiter.equals("MMDDYYYY")) {
+							inputMonth = dateNonDelimiter.substring(0, 2);
+							inputDay = dateNonDelimiter.substring(2, 4);
+							inputYear = dateNonDelimiter.substring(4, 8);
+						} else if (dateFormatNonDelimiter.equals("MMYYYYDD")) {
+							inputMonth = dateNonDelimiter.substring(0, 2);
+							inputYear = dateNonDelimiter.substring(2, 6);
+							inputDay = dateNonDelimiter.substring(6, 8);
+						} else if (dateFormatNonDelimiter.equals("YYYYDDMM")) {
+							inputYear = dateNonDelimiter.substring(0, 4);
+							inputDay = dateNonDelimiter.substring(4, 6);
+							inputMonth = dateNonDelimiter.substring(6, 8);
 						} else {
-
-							if (dateNonDelimiter.equals("DDMMYYYY")) {
-								inputDay = inputDate.substring(0, 2);
-								inputMonth = inputDate.substring(2, 4);
-								inputYear = inputDate.substring(4, 8);
-							} else if (dateNonDelimiter.equals("DDYYYYMM")) {
-								inputDay = inputDate.substring(0, 2);
-								inputYear = inputDate.substring(2, 6);
-								inputMonth = inputDate.substring(6, 8);
-							} else if (dateNonDelimiter.equals("MMDDYYYY")) {
-								inputMonth = inputDate.substring(0, 2);
-								inputDay = inputDate.substring(2, 4);
-								inputYear = inputDate.substring(4, 8);
-							} else if (dateNonDelimiter.equals("MMYYYYDD")) {
-								inputMonth = inputDate.substring(0, 2);
-								inputYear = inputDate.substring(2, 6);
-								inputDay = inputDate.substring(6, 8);
-							} else if (dateNonDelimiter.equals("YYYYDDMM")) {
-								inputYear = inputDate.substring(0, 4);
-								inputDay = inputDate.substring(4, 6);
-								inputMonth = inputDate.substring(6, 8);
-							} else {
-								inputYear = inputDate.substring(0, 4);
-								inputMonth = inputDate.substring(4, 6);
-								inputDay = inputDate.substring(6, 8);
-							}
+							inputYear = dateNonDelimiter.substring(0, 4);
+							inputMonth = dateNonDelimiter.substring(4, 6);
+							inputDay = dateNonDelimiter.substring(6, 8);
 						}
+
 						System.out.println(inputDay + " " + inputMonth + " " + inputYear);
 						int ipDay = Integer.parseInt(inputDay);
 						int ipMonth = Integer.parseInt(inputMonth);
@@ -250,7 +207,6 @@ public class ValidatorFormatter implements ValidateFormat {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 		return null;
 	}
 
@@ -286,6 +242,5 @@ public class ValidatorFormatter implements ValidateFormat {
 			return true;
 		else
 			return false;
-
 	}
 }
