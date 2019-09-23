@@ -8,50 +8,33 @@ public class ValidatorFormatter implements ValidateFormat {
 	@Override
 	public String formatDate(String inputDateFormat, String inputDate, String outputDateFormat) {
 
-		// Create and initialize hashmap for month strings
-		Map monthMap = new HashMap<Integer, String>();
-		monthMap.put(1, "January");
-		monthMap.put(2, "February");
-		monthMap.put(3, "March");
-		monthMap.put(4, "April");
-		monthMap.put(5, "May");
-		monthMap.put(6, "June");
-		monthMap.put(7, "July");
-		monthMap.put(8, "August");
-		monthMap.put(9, "September");
-		monthMap.put(10, "October");
-		monthMap.put(11, "November");
-		monthMap.put(12, "December");
-
 		return null;
 	}
 
+	/*
+	 * (non-Javadoc)
+	 * 
+	 * @see
+	 * com.date.validatorformatter.ValidateFormat#validateDate(java.lang.String,
+	 * java.lang.String)
+	 */
 	@Override
 	public String validateDate(String inputDateFormat, String inputDate) {
 
 		// Create and initialize hashmap for month strings
-		Map monthMap = new HashMap<Integer, String>();
-		monthMap.put(1, "January");
-		monthMap.put(2, "February");
-		monthMap.put(3, "March");
-		monthMap.put(4, "April");
-		monthMap.put(5, "May");
-		monthMap.put(6, "June");
-		monthMap.put(7, "July");
-		monthMap.put(8, "August");
-		monthMap.put(9, "September");
-		monthMap.put(10, "October");
-		monthMap.put(11, "November");
-		monthMap.put(12, "December");
-
-		Map dayMap = new HashMap<Integer, String>();
-		dayMap.put(1, "Monday");
-		dayMap.put(2, "Tuesday");
-		dayMap.put(3, "Wednesday");
-		dayMap.put(4, "Thursday");
-		dayMap.put(5, "Friday");
-		dayMap.put(6, "Saturday");
-		dayMap.put(7, "Sunday");
+		Map<String, Integer> monthMap = new HashMap<String, Integer>();
+		monthMap.put("JANUARY", 1);
+		monthMap.put("FEBURARY", 2);
+		monthMap.put("MARCH", 3);
+		monthMap.put("APRIL", 4);
+		monthMap.put("MAY", 5);
+		monthMap.put("JUNE", 6);
+		monthMap.put("JULY", 7);
+		monthMap.put("AUGUST", 8);
+		monthMap.put("SEPTEMBER", 9);
+		monthMap.put("OCTOBER", 10);
+		monthMap.put("NOVEMBER", 11);
+		monthMap.put("DECEMBER", 12);
 
 		String[] monthFormats = { "mm", "mmm", "mmmm" };
 		String[] yearFormats = { "yy", "yyyy" };
@@ -124,10 +107,12 @@ public class ValidatorFormatter implements ValidateFormat {
 							inputYear = dateNonDelimiter.substring(0, 2);
 							inputDay = dateNonDelimiter.substring(2, 4);
 							inputMonth = dateNonDelimiter.substring(4, 6);
-						} else {
+						} else if (dateFormatNonDelimiter.equals("YYMMDD")) {
 							inputYear = dateNonDelimiter.substring(0, 2);
 							inputMonth = dateNonDelimiter.substring(2, 4);
 							inputDay = dateNonDelimiter.substring(4, 6);
+						} else {
+							throw new Exception("Error: Date is invalid.");
 						}
 
 						int ipDay = Integer.parseInt(inputDay);
@@ -181,10 +166,12 @@ public class ValidatorFormatter implements ValidateFormat {
 							inputYear = dateNonDelimiter.substring(0, 4);
 							inputDay = dateNonDelimiter.substring(4, 6);
 							inputMonth = dateNonDelimiter.substring(6, 8);
-						} else {
+						} else if (dateFormatNonDelimiter.equals("YYYYMMDD")) {
 							inputYear = dateNonDelimiter.substring(0, 4);
 							inputMonth = dateNonDelimiter.substring(4, 6);
 							inputDay = dateNonDelimiter.substring(6, 8);
+						} else {
+							throw new Exception("Error: Date is invalid.");
 						}
 
 						System.out.println(inputDay + " " + inputMonth + " " + inputYear);
@@ -203,8 +190,71 @@ public class ValidatorFormatter implements ValidateFormat {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+
+				// Select the DDMMMYYYY variants and verify validity
+			} else if (dateFormatNonDelimiter.equals("DDMMMYYYY") || dateFormatNonDelimiter.equals("DDYYYYMMM")
+					|| dateFormatNonDelimiter.equals("MMMDDYYYY") || dateFormatNonDelimiter.equals("MMMYYYYDD")
+					|| dateFormatNonDelimiter.equals("YYYYDDMMM") || dateFormatNonDelimiter.equals("YYYYMMMDD")) {
+
+				try {
+					if (dateNonDelimiter.length() != 9)
+						throw new Exception("Error: Date is invalid. Invalid length for the input date.");
+					else {
+
+						if (dateFormatNonDelimiter.equals("DDMMMYYYY")) {
+							inputDay = dateNonDelimiter.substring(0, 2);
+							inputMonth = dateNonDelimiter.substring(2, 5);
+							inputYear = dateNonDelimiter.substring(5, 9);
+						} else if (dateFormatNonDelimiter.equals("DDYYYYMMM")) {
+							inputDay = dateNonDelimiter.substring(0, 2);
+							inputYear = dateNonDelimiter.substring(2, 6);
+							inputMonth = dateNonDelimiter.substring(6, 9);
+						} else if (dateFormatNonDelimiter.equals("MMMDDYYYY")) {
+							inputMonth = dateNonDelimiter.substring(0, 3);
+							inputDay = dateNonDelimiter.substring(3, 5);
+							inputYear = dateNonDelimiter.substring(5, 9);
+						} else if (dateFormatNonDelimiter.equals("MMMYYYYDD")) {
+							inputMonth = dateNonDelimiter.substring(0, 3);
+							inputYear = dateNonDelimiter.substring(3, 7);
+							inputDay = dateNonDelimiter.substring(7, 9);
+						} else if (dateFormatNonDelimiter.equals("YYYYDDMMM")) {
+							inputYear = dateNonDelimiter.substring(0, 4);
+							inputDay = dateNonDelimiter.substring(4, 6);
+							inputMonth = dateNonDelimiter.substring(6, 9);
+						} else if (dateFormatNonDelimiter.equals("YYYYMMMDD")) {
+							inputYear = dateNonDelimiter.substring(0, 4);
+							inputMonth = dateNonDelimiter.substring(4, 7);
+							inputDay = dateNonDelimiter.substring(7, 9);
+						} else {
+							throw new Exception("Error: Date is invalid.");
+						}
+
+						System.out.println(inputDay + " " + inputMonth + " " + inputYear);
+						int ipDay = Integer.parseInt(inputDay);
+
+						int ipMonth = 0;
+						for (Map.Entry<String, Integer> mon : monthMap.entrySet()) {
+							if (mon.toString().substring(0, 3).equals(inputMonth.toUpperCase()))
+								ipMonth = mon.getValue();
+						}
+						int ipYear = Integer.parseInt(inputYear);
+
+						if (monthValidator(ipMonth) == false) {
+							throw new Exception("Invalid month in the input date.");
+						} else if (yearValidator(ipYear) == false) {
+							throw new Exception("Invalid year in the input date.");
+						} else if (dayValidator(ipDay, ipMonth, ipYear) == false) {
+							throw new Exception("Invalid day in the input date.");
+						}
+					}
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
-		} catch (Exception e) {
+		}
+
+		// Global Exceptions
+		catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
