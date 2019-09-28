@@ -25,7 +25,16 @@ public class TestFunction {
 					String inputDate = br.readLine();
 
 					ValidateFormat vf = new ValidatorFormatter();
-					vf.validateDate(inputDateFormat, inputDate);
+					validatorResult vr = new validatorResult();
+					vr = vf.validateDate(inputDateFormat, inputDate);
+
+					// Display whole output
+					System.out.println("Input day :" + vr.getInputDay());
+					System.out.println("Input month :" + vr.getInputMonth());
+					System.out.println("Input year: " + vr.getInputYear());
+					System.out.println("Is date valid: " + vr.getIsValidDate());
+					System.out.println("Is format valid: " + vr.getIsValidFormat());
+					System.out.println("Message: " + vr.getMessage());
 				}
 				// Validation and formatting performed
 				else if (choice.equals("2")) {

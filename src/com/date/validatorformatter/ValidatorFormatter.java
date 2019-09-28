@@ -5,6 +5,22 @@ import java.util.HashMap;
 
 public class ValidatorFormatter implements ValidateFormat {
 
+	private static Map<String, Integer> MONTH_MAP = new HashMap<String, Integer>();
+	static {
+		MONTH_MAP.put("JANUARY", 1);
+		MONTH_MAP.put("FEBURARY", 2);
+		MONTH_MAP.put("MARCH", 3);
+		MONTH_MAP.put("APRIL", 4);
+		MONTH_MAP.put("MAY", 5);
+		MONTH_MAP.put("JUNE", 6);
+		MONTH_MAP.put("JULY", 7);
+		MONTH_MAP.put("AUGUST", 8);
+		MONTH_MAP.put("SEPTEMBER", 9);
+		MONTH_MAP.put("OCTOBER", 10);
+		MONTH_MAP.put("NOVEMBER", 11);
+		MONTH_MAP.put("DECEMBER", 12);
+	}
+
 	@Override
 	public String formatDate(String inputDateFormat, String inputDate, String outputDateFormat) {
 
@@ -12,22 +28,7 @@ public class ValidatorFormatter implements ValidateFormat {
 	}
 
 	@Override
-	public String validateDate(String inputDateFormat, String inputDate) {
-
-		// Create and initialize hashmap for month strings
-		Map<String, Integer> monthMap = new HashMap<String, Integer>();
-		monthMap.put("JANUARY", 1);
-		monthMap.put("FEBURARY", 2);
-		monthMap.put("MARCH", 3);
-		monthMap.put("APRIL", 4);
-		monthMap.put("MAY", 5);
-		monthMap.put("JUNE", 6);
-		monthMap.put("JULY", 7);
-		monthMap.put("AUGUST", 8);
-		monthMap.put("SEPTEMBER", 9);
-		monthMap.put("OCTOBER", 10);
-		monthMap.put("NOVEMBER", 11);
-		monthMap.put("DECEMBER", 12);
+	public validatorResult validateDate(String inputDateFormat, String inputDate) {
 
 		Map<Character, Character> numCheck = new HashMap<Character, Character>();
 		numCheck.put('0', '0');
@@ -46,9 +47,10 @@ public class ValidatorFormatter implements ValidateFormat {
 		dateCheck.put('M', '0');
 		dateCheck.put('Y', '0');
 
-		Map<Character, Character> delCheck = new HashMap<Character, Character>();
-		delCheck.put('/', '0');
-		delCheck.put('.', '0');
+		Map<Character, Character> delimiterCheck = new HashMap<Character, Character>();
+		delimiterCheck.put('/', '0');
+		delimiterCheck.put('.', '0');
+		delimiterCheck.put(' ', '0');
 
 		StringBuilder sbDateFormatNonDelimiter = new StringBuilder();
 		StringBuilder sbDateNonDelimiter = new StringBuilder();
@@ -58,43 +60,57 @@ public class ValidatorFormatter implements ValidateFormat {
 		try {
 
 			// Convert to non delimited date format
-			StringBuilder formatDelimiter = new StringBuilder();
+			StringBuilder sbFormatDelimiter = new StringBuilder();
 			for (int i = 0; i < inputDateFormat.length(); i++) {
-				if (!dateCheck.containsKey(inputDateFormat.charAt(i)))
-					formatDelimiter.append(inputDateFormat.charAt(i));
-				else {
+				if (!dateCheck.containsKey(inputDateFormat.charAt(i))) {
+					sbFormatDelimiter.append(inputDateFormat.charAt(i));
+				} else {
 					sbDateFormatNonDelimiter.append(inputDateFormat.charAt(i));
 				}
 			}
-			System.out.println("Delimiter detected in format: " + formatDelimiter);
-			if (formatDelimiter.length() != 2) {
-				throw new Exception("Invalid Date Format: More then 2 delimiters detected.");
-			} else if (formatDelimiter.charAt(0) != formatDelimiter.charAt(1)) {
-				System.out.println("Warning: Different delimiters detected in format. Both will be considered.");
+			System.out.println("Delimiter detected in format: " + sbFormatDelimiter);
+
+			// Date format delimiter validations
+			if (sbFormatDelimiter.length() != 2 && sbFormatDelimiter.length() != 0) {
+				validatorResult vr = new validatorResult();
+				vr.setIsValidDate(false);
+				vr.setMessage("ERROR: Invalid Date Format. Invalid number of delimiters detected.");
+				return vr;
+			} else if (sbFormatDelimiter.length() != 0 && sbFormatDelimiter.charAt(0) != sbFormatDelimiter.charAt(1)) {
+				System.out.println("WARNING: Different delimiters detected in format. Both will be considered.");
+			} else if (sbFormatDelimiter.length() == 0) {
+				System.out.println("WARNING: No delimiter detected in format.");
 			}
 
 			// Convert to non delimited date
-			StringBuilder dateDelimiter = new StringBuilder();
+			StringBuilder sbDateDelimiter = new StringBuilder();
 			for (int i = 0; i < inputDate.length(); i++) {
-				if (!numCheck.containsKey(inputDate.charAt(i))) {
-					dateDelimiter.append(inputDate.charAt(i));
+				if (delimiterCheck.containsKey(inputDate.charAt(i))) {
+					sbDateDelimiter.append(inputDate.charAt(i));
 				} else {
 					sbDateNonDelimiter.append(inputDate.charAt(i));
 				}
 			}
-			System.out.println("Delimiter detected in date: " + dateDelimiter);
+			System.out.println("Delimiter detected in date: " + sbDateDelimiter);
 
-			if (dateDelimiter.length() != 2) {
-				throw new Exception("Invalid Date: More then 2 delimiters detected.");
-			} else if (formatDelimiter.charAt(0) != dateDelimiter.charAt(0)
-					|| formatDelimiter.charAt(1) != dateDelimiter.charAt(1)) {
-				System.out.println("Dates do not match : Invalid delimiter");
+			// Date delimiter validations
+			if (sbDateDelimiter.length() != 2 && sbDateDelimiter.length() != 0) {
+				validatorResult vr = new validatorResult();
+				vr.setIsValidDate(false);
+				vr.setMessage("ERROR: Invalid Date. Invalid number of delimiters detected.");
+				return vr;
+			} else if (sbDateDelimiter.length() != 0 && sbDateDelimiter.charAt(0) != sbDateDelimiter.charAt(1)) {
+				System.out.println("WARNING: Different delimiters detected in date. Both will be considered.");
+			} else if (sbDateDelimiter.length() == 0) {
+				System.out.println("WARNING: No delimiter detected in date.");
 			}
 			System.out.println(sbDateFormatNonDelimiter);
 			System.out.println(sbDateNonDelimiter);
 
 			String dateFormatNonDelimiter = sbDateFormatNonDelimiter.toString();
 			String dateNonDelimiter = sbDateNonDelimiter.toString();
+			String formatDelimiter = sbFormatDelimiter.toString();
+			String dateDelimiter = sbDateDelimiter.toString();
 			String inputDay;
 			String inputMonth;
 			String inputYear;
@@ -104,9 +120,13 @@ public class ValidatorFormatter implements ValidateFormat {
 					|| dateFormatNonDelimiter.equals("MMDDYY") || dateFormatNonDelimiter.equals("MMYYDD")
 					|| dateFormatNonDelimiter.equals("YYDDMM") || dateFormatNonDelimiter.equals("YYMMDD")) {
 				try {
-					if (dateNonDelimiter.length() != 6)
-						throw new Exception("Error: Date is invalid. Invalid length for the input date.");
-					else {
+					if (dateNonDelimiter.length() != 6) {
+						validatorResult vr = new validatorResult();
+						vr.setIsValidDate(false);
+						vr.setIsValidFormat(true);
+						vr.setMessage("ERROR: Date is invalid. Invalid length for the input date.");
+						return vr;
+					} else {
 
 						if (dateFormatNonDelimiter.equals("DDMMYY")) {
 							inputDay = dateNonDelimiter.substring(0, 2);
@@ -133,24 +153,54 @@ public class ValidatorFormatter implements ValidateFormat {
 							inputMonth = dateNonDelimiter.substring(2, 4);
 							inputDay = dateNonDelimiter.substring(4, 6);
 						} else {
-							throw new Exception("Error: Date is invalid.");
+							validatorResult vr = new validatorResult();
+							vr.setIsValidDate(false);
+							vr.setMessage("ERROR: Date is invalid.");
+							return vr;
 						}
 
-						int ipDay = Integer.parseInt(inputDay);
-						int ipMonth = Integer.parseInt(inputMonth);
-						int rawIpYear = Integer.parseInt(inputYear);
-						int ipYear;
-						if (rawIpYear < 50)
-							ipYear = 2000 + rawIpYear;
-						else
-							ipYear = 1900 + rawIpYear;
-
-						if (monthValidator(ipMonth) == false) {
-							throw new Exception("Invalid month in the input date.");
-						} else if (yearValidator(ipYear) == false) {
-							throw new Exception("Invalid year in the input date.");
-						} else if (dayValidator(ipDay, ipMonth, ipYear) == false) {
-							throw new Exception("Invalid day in the input date.");
+						String yearValidatorOp;
+						if (monthValidator(inputMonth, numCheck).equals("false")) {
+							validatorResult vr = new validatorResult();
+							vr.setInputDay(inputDay);
+							vr.setInputMonth(inputMonth);
+							vr.setInputYear(inputYear);
+							vr.setIsValidDate(false);
+							vr.setIsValidFormat(true);
+							vr.setMessage("ERROR: Invalid month value in the input date.");
+							return vr;
+						} else if ((yearValidatorOp = yearValidator(inputYear, numCheck)).equals("false")) {
+							validatorResult vr = new validatorResult();
+							vr.setInputDay(inputDay);
+							vr.setInputMonth(inputMonth);
+							vr.setInputYear(inputYear);
+							vr.setIsValidDate(false);
+							vr.setIsValidFormat(true);
+							vr.setMessage("ERROR: Invalid year value in the input date.");
+							return vr;
+						} else if (dayValidator(inputDay, Integer.parseInt(inputMonth),
+								Integer.parseInt(yearValidatorOp), numCheck).equals("false")) {
+							validatorResult vr = new validatorResult();
+							vr.setInputDay(inputDay);
+							vr.setInputMonth(inputMonth);
+							vr.setInputYear(inputYear);
+							vr.setIsValidDate(false);
+							vr.setIsValidFormat(true);
+							vr.setMessage("ERROR: Invalid day value in the input date.");
+							return vr;
+						} else {
+							validatorResult vr = new validatorResult();
+							vr.setInputDay(inputDay);
+							vr.setInputMonth(inputMonth);
+							vr.setInputYear(inputYear);
+							if (dateDelimiter.equals(formatDelimiter)) {
+								vr.setMessage("INFO: Valid input date.");
+							} else {
+								vr.setMessage("ERROR: Date valid but delimiters do not match.");
+							}
+							vr.setIsValidDate(true);
+							vr.setIsValidFormat(true);
+							return vr;
 						}
 					}
 				} catch (Exception e) {
@@ -163,9 +213,13 @@ public class ValidatorFormatter implements ValidateFormat {
 					|| dateFormatNonDelimiter.equals("YYYYDDMM") || dateFormatNonDelimiter.equals("YYYYMMDD")) {
 
 				try {
-					if (dateNonDelimiter.length() != 8)
-						throw new Exception("Error: Date is invalid. Invalid length for the input date.");
-					else {
+					if (dateNonDelimiter.length() != 8) {
+						validatorResult vr = new validatorResult();
+						vr.setIsValidDate(false);
+						vr.setIsValidFormat(true);
+						vr.setMessage("ERROR: Date is invalid. Invalid length for the input date.");
+						return vr;
+					} else {
 
 						if (dateFormatNonDelimiter.equals("DDMMYYYY")) {
 							inputDay = dateNonDelimiter.substring(0, 2);
@@ -192,20 +246,57 @@ public class ValidatorFormatter implements ValidateFormat {
 							inputMonth = dateNonDelimiter.substring(4, 6);
 							inputDay = dateNonDelimiter.substring(6, 8);
 						} else {
-							throw new Exception("Error: Date is invalid.");
+							validatorResult vr = new validatorResult();
+							vr.setIsValidDate(false);
+							vr.setIsValidFormat(true);
+							vr.setMessage("ERROR: Date is invalid.");
+							return vr;
 						}
 
 						System.out.println(inputDay + " " + inputMonth + " " + inputYear);
-						int ipDay = Integer.parseInt(inputDay);
-						int ipMonth = Integer.parseInt(inputMonth);
-						int ipYear = Integer.parseInt(inputYear);
 
-						if (monthValidator(ipMonth) == false) {
-							throw new Exception("Invalid month in the input date.");
-						} else if (yearValidator(ipYear) == false) {
-							throw new Exception("Invalid year in the input date.");
-						} else if (dayValidator(ipDay, ipMonth, ipYear) == false) {
-							throw new Exception("Invalid day in the input date.");
+						String yearValidatorOp;
+						if (monthValidator(inputMonth, numCheck).equals("false")) {
+							validatorResult vr = new validatorResult();
+							vr.setInputDay(inputDay);
+							vr.setInputMonth(inputMonth);
+							vr.setInputYear(inputYear);
+							vr.setIsValidDate(false);
+							vr.setIsValidFormat(true);
+							vr.setMessage("ERROR: Invalid month value in the input date.");
+							return vr;
+						} else if ((yearValidatorOp = yearValidator(inputYear, numCheck)).equals("false")) {
+							validatorResult vr = new validatorResult();
+							vr.setInputDay(inputDay);
+							vr.setInputMonth(inputMonth);
+							vr.setInputYear(inputYear);
+							vr.setIsValidDate(false);
+							vr.setIsValidFormat(true);
+							vr.setMessage("ERROR: Invalid year value in the input date.");
+							return vr;
+						} else if (dayValidator(inputDay, Integer.parseInt(inputMonth),
+								Integer.parseInt(yearValidatorOp), numCheck).equals("false")) {
+							validatorResult vr = new validatorResult();
+							vr.setInputDay(inputDay);
+							vr.setInputMonth(inputMonth);
+							vr.setInputYear(inputYear);
+							vr.setIsValidDate(false);
+							vr.setIsValidFormat(true);
+							vr.setMessage("ERROR: Invalid day value in the input date.");
+							return vr;
+						} else {
+							validatorResult vr = new validatorResult();
+							vr.setInputDay(inputDay);
+							vr.setInputMonth(inputMonth);
+							vr.setInputYear(inputYear);
+							if (dateDelimiter.equals(formatDelimiter)) {
+								vr.setMessage("INFO: Valid input date.");
+							} else {
+								vr.setMessage("ERROR: Date valid but delimiters do not match.");
+							}
+							vr.setIsValidDate(true);
+							vr.setIsValidFormat(true);
+							return vr;
 						}
 					}
 				} catch (Exception e) {
@@ -218,9 +309,13 @@ public class ValidatorFormatter implements ValidateFormat {
 					|| dateFormatNonDelimiter.equals("YYDDMMM") || dateFormatNonDelimiter.equals("YYMMMDD")) {
 
 				try {
-					if (dateNonDelimiter.length() != 7)
-						throw new Exception("Error: Date is invalid. Invalid length for the input date.");
-					else {
+					if (dateNonDelimiter.length() != 7) {
+						validatorResult vr = new validatorResult();
+						vr.setIsValidDate(false);
+						vr.setIsValidFormat(true);
+						vr.setMessage("ERROR: Date is invalid. Invalid length for the input date.");
+						return vr;
+					} else {
 
 						if (dateFormatNonDelimiter.equals("DDMMMYY")) {
 							inputDay = dateNonDelimiter.substring(0, 2);
@@ -247,27 +342,59 @@ public class ValidatorFormatter implements ValidateFormat {
 							inputMonth = dateNonDelimiter.substring(2, 5);
 							inputDay = dateNonDelimiter.substring(5, 7);
 						} else {
-							throw new Exception("Error: Date is invalid.");
+							validatorResult vr = new validatorResult();
+							vr.setIsValidDate(false);
+							vr.setIsValidFormat(true);
+							vr.setMessage("ERROR: Date is invalid.");
+							return vr;
 						}
 
 						System.out.println(inputDay + " " + inputMonth + " " + inputYear);
-						int ipDay = Integer.parseInt(inputDay);
-						String ipMonth = inputMonth.toUpperCase();
-						int rawIpYear = Integer.parseInt(inputYear);
-						int ipYear;
-						if (rawIpYear < 50)
-							ipYear = 2000 + rawIpYear;
-						else
-							ipYear = 1900 + rawIpYear;
 
 						String monthValidatorOp;
-						if ((monthValidatorOp = monthValidator(ipMonth, dateFormatNonDelimiter, monthMap))
-								.equals("false")) {
-							throw new Exception("Invalid month in the input date.");
-						} else if (yearValidator(ipYear) == false) {
-							throw new Exception("Invalid year in the input date.");
-						} else if (dayValidator(ipDay, monthMap.get(monthValidatorOp), ipYear) == false) {
-							throw new Exception("Invalid day in the input date.");
+						String yearValidatorOp;
+						if ((monthValidatorOp = monthValidator(inputMonth.toUpperCase(), dateFormatNonDelimiter,
+								MONTH_MAP)).equals("false")) {
+							validatorResult vr = new validatorResult();
+							vr.setInputDay(inputDay);
+							vr.setInputMonth(inputMonth);
+							vr.setInputYear(inputYear);
+							vr.setIsValidDate(false);
+							vr.setIsValidFormat(true);
+							vr.setMessage("ERROR: Invalid month value in the input date.");
+							return vr;
+						} else if ((yearValidatorOp = yearValidator(inputYear, numCheck)).equals("false")) {
+							validatorResult vr = new validatorResult();
+							vr.setInputDay(inputDay);
+							vr.setInputMonth(inputMonth);
+							vr.setInputYear(inputYear);
+							vr.setIsValidDate(false);
+							vr.setIsValidFormat(true);
+							vr.setMessage("ERROR: Invalid year value in the input date.");
+							return vr;
+						} else if (dayValidator(inputDay, MONTH_MAP.get(monthValidatorOp),
+								Integer.parseInt(yearValidatorOp), numCheck).equals("false")) {
+							validatorResult vr = new validatorResult();
+							vr.setInputDay(inputDay);
+							vr.setInputMonth(inputMonth);
+							vr.setInputYear(inputYear);
+							vr.setIsValidDate(false);
+							vr.setIsValidFormat(true);
+							vr.setMessage("ERROR: Invalid day value in the input date.");
+							return vr;
+						} else {
+							validatorResult vr = new validatorResult();
+							vr.setInputDay(inputDay);
+							vr.setInputMonth(inputMonth);
+							vr.setInputYear(inputYear);
+							if (dateDelimiter.equals(formatDelimiter)) {
+								vr.setMessage("INFO: Valid input date.");
+							} else {
+								vr.setMessage("ERROR: Date valid but delimiters do not match.");
+							}
+							vr.setIsValidDate(true);
+							vr.setIsValidFormat(true);
+							return vr;
 						}
 					}
 				} catch (Exception e) {
@@ -279,9 +406,13 @@ public class ValidatorFormatter implements ValidateFormat {
 					|| dateFormatNonDelimiter.equals("YYYYDDMMM") || dateFormatNonDelimiter.equals("YYYYMMMDD")) {
 
 				try {
-					if (dateNonDelimiter.length() != 9)
-						throw new Exception("Error: Date is invalid. Invalid length for the input date.");
-					else {
+					if (dateNonDelimiter.length() != 9) {
+						validatorResult vr = new validatorResult();
+						vr.setIsValidDate(false);
+						vr.setIsValidFormat(true);
+						vr.setMessage("ERROR: Date is invalid. Invalid length for the input date.");
+						return vr;
+					} else {
 
 						if (dateFormatNonDelimiter.equals("DDMMMYYYY")) {
 							inputDay = dateNonDelimiter.substring(0, 2);
@@ -308,22 +439,59 @@ public class ValidatorFormatter implements ValidateFormat {
 							inputMonth = dateNonDelimiter.substring(4, 7);
 							inputDay = dateNonDelimiter.substring(7, 9);
 						} else {
-							throw new Exception("Error: Date is invalid.");
+							validatorResult vr = new validatorResult();
+							vr.setIsValidDate(false);
+							vr.setIsValidFormat(true);
+							vr.setMessage("ERROR: Date is invalid.");
+							return vr;
 						}
 
 						System.out.println(inputDay + " " + inputMonth + " " + inputYear);
-						int ipDay = Integer.parseInt(inputDay);
-						String ipMonth = inputMonth.toUpperCase();
-						int ipYear = Integer.parseInt(inputYear);
 
 						String monthValidatorOp;
-						if ((monthValidatorOp = monthValidator(ipMonth, dateFormatNonDelimiter, monthMap))
-								.equals("false")) {
-							throw new Exception("Invalid month in the input date.");
-						} else if (yearValidator(ipYear) == false) {
-							throw new Exception("Invalid year in the input date.");
-						} else if (dayValidator(ipDay, monthMap.get(monthValidatorOp), ipYear) == false) {
-							throw new Exception("Invalid day in the input date.");
+						String yearValidatorOp;
+						if ((monthValidatorOp = monthValidator(inputMonth.toUpperCase(), dateFormatNonDelimiter,
+								MONTH_MAP)).equals("false")) {
+							validatorResult vr = new validatorResult();
+							vr.setInputDay(inputDay);
+							vr.setInputMonth(inputMonth);
+							vr.setInputYear(inputYear);
+							vr.setIsValidDate(false);
+							vr.setIsValidFormat(true);
+							vr.setMessage("ERROR: Invalid month value in the input date.");
+							return vr;
+						} else if ((yearValidatorOp = yearValidator(inputYear, numCheck)).equals("false")) {
+							validatorResult vr = new validatorResult();
+							vr.setInputDay(inputDay);
+							vr.setInputMonth(inputMonth);
+							vr.setInputYear(inputYear);
+							vr.setIsValidDate(false);
+							vr.setIsValidFormat(true);
+							vr.setMessage("ERROR: Invalid year value in the input date.");
+							return vr;
+						} else if (dayValidator(inputDay, MONTH_MAP.get(monthValidatorOp),
+								Integer.parseInt(yearValidatorOp), numCheck).equals("false")) {
+							validatorResult vr = new validatorResult();
+							vr.setInputDay(inputDay);
+							vr.setInputMonth(inputMonth);
+							vr.setInputYear(inputYear);
+							vr.setIsValidDate(false);
+							vr.setIsValidFormat(true);
+							vr.setMessage("ERROR: Invalid day value in the input date.");
+							return vr;
+						} else {
+							validatorResult vr = new validatorResult();
+							vr.setInputDay(inputDay);
+							vr.setInputMonth(inputMonth);
+							vr.setInputYear(inputYear);
+							if (dateDelimiter.equals(formatDelimiter)) {
+								vr.setMessage("INFO: Valid input date.");
+							} else {
+								vr.setMessage("ERROR: Date valid but delimiters do not match.");
+							}
+							vr.setIsValidDate(true);
+							vr.setIsValidFormat(true);
+							return vr;
 						}
 					}
 				} catch (Exception e) {
@@ -335,9 +503,13 @@ public class ValidatorFormatter implements ValidateFormat {
 					|| dateFormatNonDelimiter.equals("YYDDMMMM") || dateFormatNonDelimiter.equals("YYMMMMDD")) {
 
 				try {
-					if (dateNonDelimiter.length() < 7 || dateNonDelimiter.length() > 14)
-						throw new Exception("Error: Date is invalid. Invalid length for the input date.");
-					else {
+					if (dateNonDelimiter.length() < 7 || dateNonDelimiter.length() > 14) {
+						validatorResult vr = new validatorResult();
+						vr.setIsValidDate(false);
+						vr.setIsValidFormat(true);
+						vr.setMessage("ERROR: Date is invalid. Invalid length for the input date.");
+						return vr;
+					} else {
 
 						if (dateFormatNonDelimiter.equals("DDMMMMYY")) {
 							inputDay = dateNonDelimiter.substring(0, 2);
@@ -370,27 +542,59 @@ public class ValidatorFormatter implements ValidateFormat {
 							inputDay = dateNonDelimiter.substring(dateNonDelimiter.length() - 2,
 									dateNonDelimiter.length());
 						} else {
-							throw new Exception("Error: Date is invalid.");
+							validatorResult vr = new validatorResult();
+							vr.setIsValidDate(false);
+							vr.setIsValidFormat(true);
+							vr.setMessage("ERROR: Date is invalid.");
+							return vr;
 						}
 
 						System.out.println(inputDay + " " + inputMonth + " " + inputYear);
-						int ipDay = Integer.parseInt(inputDay);
-						String ipMonth = inputMonth.toUpperCase();
 
-						int rawIpYear = Integer.parseInt(inputYear);
-						int ipYear;
-						if (rawIpYear < 50)
-							ipYear = 2000 + rawIpYear;
-						else
-							ipYear = 1900 + rawIpYear;
 						String monthValidatorOp;
-						if ((monthValidatorOp = monthValidator(ipMonth, dateFormatNonDelimiter, monthMap))
-								.equals("false")) {
-							throw new Exception("Invalid month in the input date.");
-						} else if (yearValidator(ipYear) == false) {
-							throw new Exception("Invalid year in the input date.");
-						} else if (dayValidator(ipDay, monthMap.get(monthValidatorOp), ipYear) == false) {
-							throw new Exception("Invalid day in the input date.");
+						String yearValidatorOp;
+						if ((monthValidatorOp = monthValidator(inputMonth.toUpperCase(), dateFormatNonDelimiter,
+								MONTH_MAP)).equals("false")) {
+							validatorResult vr = new validatorResult();
+							vr.setInputDay(inputDay);
+							vr.setInputMonth(inputMonth);
+							vr.setInputYear(inputYear);
+							vr.setIsValidDate(false);
+							vr.setIsValidFormat(true);
+							vr.setMessage("ERROR: Invalid month value in the input date.");
+							return vr;
+						} else if ((yearValidatorOp = yearValidator(inputYear, numCheck)).equals("false")) {
+							validatorResult vr = new validatorResult();
+							vr.setInputDay(inputDay);
+							vr.setInputMonth(inputMonth);
+							vr.setInputYear(inputYear);
+							vr.setIsValidDate(false);
+							vr.setIsValidFormat(true);
+							vr.setMessage("ERROR: Invalid year value in the input date.");
+							return vr;
+						} else if (dayValidator(inputDay, MONTH_MAP.get(monthValidatorOp),
+								Integer.parseInt(yearValidatorOp), numCheck).equals("false")) {
+							validatorResult vr = new validatorResult();
+							vr.setInputDay(inputDay);
+							vr.setInputMonth(inputMonth);
+							vr.setInputYear(inputYear);
+							vr.setIsValidDate(false);
+							vr.setIsValidFormat(true);
+							vr.setMessage("ERROR: Invalid day value in the input date.");
+							return vr;
+						} else {
+							validatorResult vr = new validatorResult();
+							vr.setInputDay(inputDay);
+							vr.setInputMonth(inputMonth);
+							vr.setInputYear(inputYear);
+							if (dateDelimiter.equals(formatDelimiter)) {
+								vr.setMessage("INFO: Valid input date.");
+							} else {
+								vr.setMessage("ERROR: Date valid but delimiters do not match.");
+							}
+							vr.setIsValidDate(true);
+							vr.setIsValidFormat(true);
+							return vr;
 						}
 					}
 				} catch (Exception e) {
@@ -402,9 +606,13 @@ public class ValidatorFormatter implements ValidateFormat {
 					|| dateFormatNonDelimiter.equals("YYYYDDMMMM") || dateFormatNonDelimiter.equals("YYYYMMMMDD")) {
 
 				try {
-					if (dateNonDelimiter.length() < 9 || dateNonDelimiter.length() > 16)
-						throw new Exception("Error: Date is invalid. Invalid length for the input date.");
-					else {
+					if (dateNonDelimiter.length() < 9 || dateNonDelimiter.length() > 16) {
+						validatorResult vr = new validatorResult();
+						vr.setIsValidDate(false);
+						vr.setIsValidFormat(true);
+						vr.setMessage("ERROR: Date is invalid. Invalid length for the input date.");
+						return vr;
+					} else {
 
 						if (dateFormatNonDelimiter.equals("DDMMMMYYYY")) {
 							inputDay = dateNonDelimiter.substring(0, 2);
@@ -437,32 +645,69 @@ public class ValidatorFormatter implements ValidateFormat {
 							inputDay = dateNonDelimiter.substring(dateNonDelimiter.length() - 2,
 									dateNonDelimiter.length());
 						} else {
-							throw new Exception("Error: Date is invalid.");
+							validatorResult vr = new validatorResult();
+							vr.setIsValidDate(false);
+							vr.setIsValidFormat(true);
+							vr.setMessage("ERROR: Date is invalid.");
+							return vr;
 						}
 
 						System.out.println(inputDay + " " + inputMonth + " " + inputYear);
-						int ipDay = Integer.parseInt(inputDay);
-						String ipMonth = inputMonth.toUpperCase();
-						int rawIpYear = Integer.parseInt(inputYear);
-						int ipYear;
-						if (rawIpYear < 50)
-							ipYear = 2000 + rawIpYear;
-						else
-							ipYear = 1900 + rawIpYear;
 
 						String monthValidatorOp;
-						if ((monthValidatorOp = monthValidator(ipMonth, dateFormatNonDelimiter, monthMap))
-								.equals("false")) {
-							throw new Exception("Invalid month in the input date.");
-						} else if (yearValidator(ipYear) == false) {
-							throw new Exception("Invalid year in the input date.");
-						} else if (dayValidator(ipDay, monthMap.get(monthValidatorOp), ipYear) == false) {
-							throw new Exception("Invalid day in the input date.");
+						String yearValidatorOp;
+						if ((monthValidatorOp = monthValidator(inputMonth.toUpperCase(), dateFormatNonDelimiter,
+								MONTH_MAP)).equals("false")) {
+							validatorResult vr = new validatorResult();
+							vr.setInputDay(inputDay);
+							vr.setInputMonth(inputMonth);
+							vr.setInputYear(inputYear);
+							vr.setIsValidDate(false);
+							vr.setIsValidFormat(true);
+							vr.setMessage("ERROR: Invalid month value in the input date.");
+							return vr;
+						} else if ((yearValidatorOp = yearValidator(inputYear, numCheck)).equals("false")) {
+							validatorResult vr = new validatorResult();
+							vr.setInputDay(inputDay);
+							vr.setInputMonth(inputMonth);
+							vr.setInputYear(inputYear);
+							vr.setIsValidDate(false);
+							vr.setIsValidFormat(true);
+							vr.setMessage("ERROR: Invalid year value in the input date.");
+							return vr;
+						} else if (dayValidator(inputDay, MONTH_MAP.get(monthValidatorOp),
+								Integer.parseInt(yearValidatorOp), numCheck).equals("false")) {
+							validatorResult vr = new validatorResult();
+							vr.setInputDay(inputDay);
+							vr.setInputMonth(inputMonth);
+							vr.setInputYear(inputYear);
+							vr.setIsValidDate(false);
+							vr.setIsValidFormat(true);
+							vr.setMessage("ERROR: Invalid day value in the input date.");
+							return vr;
+						} else {
+							validatorResult vr = new validatorResult();
+							vr.setInputDay(inputDay);
+							vr.setInputMonth(inputMonth);
+							vr.setInputYear(inputYear);
+							if (dateDelimiter.equals(formatDelimiter)) {
+								vr.setMessage("INFO: Valid input date.");
+							} else {
+								vr.setMessage("ERROR: Date valid but delimiters do not match.");
+							}
+							vr.setIsValidDate(true);
+							vr.setIsValidFormat(true);
+							return vr;
 						}
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+			} else {
+				validatorResult vr = new validatorResult();
+				vr.setIsValidDate(false);
+				vr.setMessage("ERROR: Invalid date format.");
+				return vr;
 			}
 		}
 		// Global Exceptions
@@ -472,33 +717,47 @@ public class ValidatorFormatter implements ValidateFormat {
 		return null;
 	}
 
-	@Override
-	public boolean dayValidator(int day, int month, int year) {
+	private String dayValidator(String day, int month, int year, Map<Character, Character> numCheck) {
 
-		if (month == 2 && year % 4 == 0 && day > 0 && day < 30) {
-			return true;
-		} else if (month == 2 && year % 4 != 0 && day > 0 && day < 29) {
-			return true;
+		// Check if day values are numeric
+		for (int i = 0; i < day.length(); i++) {
+			if (!numCheck.containsKey(day.charAt(i))) {
+				return "false";
+			}
+		}
+
+		int iDay = Integer.parseInt(day);
+
+		if (month == 2 && year % 4 == 0 && iDay > 0 && iDay < 30) {
+			return day;
+		} else if (month == 2 && year % 4 != 0 && iDay > 0 && iDay < 29) {
+			return day;
 		} else if ((month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12)
-				&& day > 0 && day < 32) {
-			return true;
-		} else if ((month == 4 || month == 6 || month == 9 || month == 11) && day > 0 && day < 31) {
-			return true;
-		} else
-			return false;
+				&& iDay > 0 && iDay < 32) {
+			return day;
+		} else if ((month == 4 || month == 6 || month == 9 || month == 11) && iDay > 0 && iDay < 31) {
+			return day;
+		} else {
+			return "false";
+		}
 	}
 
-	@Override
-	public boolean monthValidator(int month) {
+	private String monthValidator(String month, Map<Character, Character> numCheck) {
 
-		if (month < 13 && month > 0)
-			return true;
-		else
-			return false;
+		// Check if month values are numeric
+		for (int i = 0; i < month.length(); i++) {
+			if (!numCheck.containsKey(month.charAt(i))) {
+				return "false";
+			}
+		}
+		if (Integer.parseInt(month) < 13 && Integer.parseInt(month) > 0) {
+			return month;
+		} else {
+			return "false";
+		}
 	}
 
-	@Override
-	public String monthValidator(String month, String dateFormatNonDelimiter, Map<String, Integer> monthMap) {
+	private String monthValidator(String month, String dateFormatNonDelimiter, Map<String, Integer> monthMap) {
 		if (dateFormatNonDelimiter.contains("MMMM") && monthMap.containsKey(month))
 			return month;
 		else if (dateFormatNonDelimiter.contains("MMM") && !dateFormatNonDelimiter.contains("MMMM")) {
@@ -511,22 +770,89 @@ public class ValidatorFormatter implements ValidateFormat {
 		return "false";
 	}
 
-	@Override
-	public boolean yearValidator(int year) {
+	private String yearValidator(String year, Map<Character, Character> numCheck) {
 
-		if (year < 9999 && year > 1000)
-			return true;
-		else
-			return false;
+		// Check if year values are numeric
+		for (int i = 0; i < year.length(); i++) {
+			if (!numCheck.containsKey(year.charAt(i))) {
+				return "false";
+			}
+		}
+		if (Integer.parseInt(year) < 9999 && Integer.parseInt(year) > 1000) {
+			return year;
+		} else if (Integer.parseInt(year) < 50) {
+			return "20" + year;
+		} else if (Integer.parseInt(year) > 50) {
+			return "19" + year;
+		} else {
+			return "false";
+		}
 	}
 
-	@Override
-	public String monthExtracter(String dateNonDelimiter, Map<Character, Character> numCheck) {
+	private String monthExtracter(String dateNonDelimiter, Map<Character, Character> numCheck) {
 		StringBuilder sbMonth = new StringBuilder();
 		for (int s = 0; s < dateNonDelimiter.length(); s++) {
-			if (!numCheck.containsKey(dateNonDelimiter.charAt(s)))
+			if (!numCheck.containsKey(dateNonDelimiter.charAt(s))) {
 				sbMonth.append(dateNonDelimiter.charAt(s));
+			}
 		}
-		return sbMonth.toString().toUpperCase();
+		return sbMonth.toString();
+	}
+}
+
+class validatorResult {
+	String inputDay;
+	String inputMonth;
+	String inputYear;
+	boolean isValidDate;
+	boolean isValidFormat;
+	String message;
+
+	public String getInputDay() {
+		return inputDay;
+	}
+
+	public void setInputDay(String inputDay) {
+		this.inputDay = inputDay;
+	}
+
+	public String getInputMonth() {
+		return inputMonth;
+	}
+
+	public void setInputMonth(String inputMonth) {
+		this.inputMonth = inputMonth;
+	}
+
+	public String getInputYear() {
+		return inputYear;
+	}
+
+	public void setInputYear(String inputYear) {
+		this.inputYear = inputYear;
+	}
+
+	public boolean getIsValidDate() {
+		return isValidDate;
+	}
+
+	public void setIsValidDate(boolean isValidDate) {
+		this.isValidDate = isValidDate;
+	}
+
+	public boolean getIsValidFormat() {
+		return isValidFormat;
+	}
+
+	public void setIsValidFormat(boolean isValidFormat) {
+		this.isValidFormat = isValidFormat;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
 	}
 }
