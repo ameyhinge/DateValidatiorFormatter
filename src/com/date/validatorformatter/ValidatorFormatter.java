@@ -73,7 +73,6 @@ public class ValidatorFormatter implements ValidateFormat {
 			// Date format delimiter validations
 			if (sbFormatDelimiter.length() != 2 && sbFormatDelimiter.length() != 0) {
 				validatorResult vr = new validatorResult();
-				vr.setIsValidDate(false);
 				vr.setMessage("ERROR: Invalid Date Format. Invalid number of delimiters detected.");
 				return vr;
 			} else if (sbFormatDelimiter.length() != 0 && sbFormatDelimiter.charAt(0) != sbFormatDelimiter.charAt(1)) {
@@ -93,17 +92,6 @@ public class ValidatorFormatter implements ValidateFormat {
 			}
 			System.out.println("Delimiter detected in date: " + sbDateDelimiter);
 
-			// Date delimiter validations
-			if (sbDateDelimiter.length() != 2 && sbDateDelimiter.length() != 0) {
-				validatorResult vr = new validatorResult();
-				vr.setIsValidDate(false);
-				vr.setMessage("ERROR: Invalid Date. Invalid number of delimiters detected.");
-				return vr;
-			} else if (sbDateDelimiter.length() != 0 && sbDateDelimiter.charAt(0) != sbDateDelimiter.charAt(1)) {
-				System.out.println("WARNING: Different delimiters detected in date. Both will be considered.");
-			} else if (sbDateDelimiter.length() == 0) {
-				System.out.println("WARNING: No delimiter detected in date.");
-			}
 			System.out.println(sbDateFormatNonDelimiter);
 			System.out.println(sbDateNonDelimiter);
 
@@ -122,7 +110,6 @@ public class ValidatorFormatter implements ValidateFormat {
 				try {
 					if (dateNonDelimiter.length() != 6) {
 						validatorResult vr = new validatorResult();
-						vr.setIsValidDate(false);
 						vr.setIsValidFormat(true);
 						vr.setMessage("ERROR: Date is invalid. Invalid length for the input date.");
 						return vr;
@@ -154,7 +141,6 @@ public class ValidatorFormatter implements ValidateFormat {
 							inputDay = dateNonDelimiter.substring(4, 6);
 						} else {
 							validatorResult vr = new validatorResult();
-							vr.setIsValidDate(false);
 							vr.setMessage("ERROR: Date is invalid.");
 							return vr;
 						}
@@ -165,7 +151,6 @@ public class ValidatorFormatter implements ValidateFormat {
 							vr.setInputDay(inputDay);
 							vr.setInputMonth(inputMonth);
 							vr.setInputYear(inputYear);
-							vr.setIsValidDate(false);
 							vr.setIsValidFormat(true);
 							vr.setMessage("ERROR: Invalid month value in the input date.");
 							return vr;
@@ -174,7 +159,6 @@ public class ValidatorFormatter implements ValidateFormat {
 							vr.setInputDay(inputDay);
 							vr.setInputMonth(inputMonth);
 							vr.setInputYear(inputYear);
-							vr.setIsValidDate(false);
 							vr.setIsValidFormat(true);
 							vr.setMessage("ERROR: Invalid year value in the input date.");
 							return vr;
@@ -184,7 +168,6 @@ public class ValidatorFormatter implements ValidateFormat {
 							vr.setInputDay(inputDay);
 							vr.setInputMonth(inputMonth);
 							vr.setInputYear(inputYear);
-							vr.setIsValidDate(false);
 							vr.setIsValidFormat(true);
 							vr.setMessage("ERROR: Invalid day value in the input date.");
 							return vr;
@@ -215,7 +198,6 @@ public class ValidatorFormatter implements ValidateFormat {
 				try {
 					if (dateNonDelimiter.length() != 8) {
 						validatorResult vr = new validatorResult();
-						vr.setIsValidDate(false);
 						vr.setIsValidFormat(true);
 						vr.setMessage("ERROR: Date is invalid. Invalid length for the input date.");
 						return vr;
@@ -247,8 +229,6 @@ public class ValidatorFormatter implements ValidateFormat {
 							inputDay = dateNonDelimiter.substring(6, 8);
 						} else {
 							validatorResult vr = new validatorResult();
-							vr.setIsValidDate(false);
-							vr.setIsValidFormat(true);
 							vr.setMessage("ERROR: Date is invalid.");
 							return vr;
 						}
@@ -261,7 +241,6 @@ public class ValidatorFormatter implements ValidateFormat {
 							vr.setInputDay(inputDay);
 							vr.setInputMonth(inputMonth);
 							vr.setInputYear(inputYear);
-							vr.setIsValidDate(false);
 							vr.setIsValidFormat(true);
 							vr.setMessage("ERROR: Invalid month value in the input date.");
 							return vr;
@@ -270,7 +249,6 @@ public class ValidatorFormatter implements ValidateFormat {
 							vr.setInputDay(inputDay);
 							vr.setInputMonth(inputMonth);
 							vr.setInputYear(inputYear);
-							vr.setIsValidDate(false);
 							vr.setIsValidFormat(true);
 							vr.setMessage("ERROR: Invalid year value in the input date.");
 							return vr;
@@ -280,7 +258,6 @@ public class ValidatorFormatter implements ValidateFormat {
 							vr.setInputDay(inputDay);
 							vr.setInputMonth(inputMonth);
 							vr.setInputYear(inputYear);
-							vr.setIsValidDate(false);
 							vr.setIsValidFormat(true);
 							vr.setMessage("ERROR: Invalid day value in the input date.");
 							return vr;
@@ -311,7 +288,6 @@ public class ValidatorFormatter implements ValidateFormat {
 				try {
 					if (dateNonDelimiter.length() != 7) {
 						validatorResult vr = new validatorResult();
-						vr.setIsValidDate(false);
 						vr.setIsValidFormat(true);
 						vr.setMessage("ERROR: Date is invalid. Invalid length for the input date.");
 						return vr;
@@ -343,8 +319,6 @@ public class ValidatorFormatter implements ValidateFormat {
 							inputDay = dateNonDelimiter.substring(5, 7);
 						} else {
 							validatorResult vr = new validatorResult();
-							vr.setIsValidDate(false);
-							vr.setIsValidFormat(true);
 							vr.setMessage("ERROR: Date is invalid.");
 							return vr;
 						}
@@ -368,7 +342,6 @@ public class ValidatorFormatter implements ValidateFormat {
 							vr.setInputDay(inputDay);
 							vr.setInputMonth(inputMonth);
 							vr.setInputYear(inputYear);
-							vr.setIsValidDate(false);
 							vr.setIsValidFormat(true);
 							vr.setMessage("ERROR: Invalid year value in the input date.");
 							return vr;
@@ -378,7 +351,6 @@ public class ValidatorFormatter implements ValidateFormat {
 							vr.setInputDay(inputDay);
 							vr.setInputMonth(inputMonth);
 							vr.setInputYear(inputYear);
-							vr.setIsValidDate(false);
 							vr.setIsValidFormat(true);
 							vr.setMessage("ERROR: Invalid day value in the input date.");
 							return vr;
@@ -408,7 +380,6 @@ public class ValidatorFormatter implements ValidateFormat {
 				try {
 					if (dateNonDelimiter.length() != 9) {
 						validatorResult vr = new validatorResult();
-						vr.setIsValidDate(false);
 						vr.setIsValidFormat(true);
 						vr.setMessage("ERROR: Date is invalid. Invalid length for the input date.");
 						return vr;
@@ -440,7 +411,6 @@ public class ValidatorFormatter implements ValidateFormat {
 							inputDay = dateNonDelimiter.substring(7, 9);
 						} else {
 							validatorResult vr = new validatorResult();
-							vr.setIsValidDate(false);
 							vr.setIsValidFormat(true);
 							vr.setMessage("ERROR: Date is invalid.");
 							return vr;
@@ -456,7 +426,6 @@ public class ValidatorFormatter implements ValidateFormat {
 							vr.setInputDay(inputDay);
 							vr.setInputMonth(inputMonth);
 							vr.setInputYear(inputYear);
-							vr.setIsValidDate(false);
 							vr.setIsValidFormat(true);
 							vr.setMessage("ERROR: Invalid month value in the input date.");
 							return vr;
@@ -465,7 +434,6 @@ public class ValidatorFormatter implements ValidateFormat {
 							vr.setInputDay(inputDay);
 							vr.setInputMonth(inputMonth);
 							vr.setInputYear(inputYear);
-							vr.setIsValidDate(false);
 							vr.setIsValidFormat(true);
 							vr.setMessage("ERROR: Invalid year value in the input date.");
 							return vr;
@@ -475,7 +443,6 @@ public class ValidatorFormatter implements ValidateFormat {
 							vr.setInputDay(inputDay);
 							vr.setInputMonth(inputMonth);
 							vr.setInputYear(inputYear);
-							vr.setIsValidDate(false);
 							vr.setIsValidFormat(true);
 							vr.setMessage("ERROR: Invalid day value in the input date.");
 							return vr;
@@ -505,7 +472,6 @@ public class ValidatorFormatter implements ValidateFormat {
 				try {
 					if (dateNonDelimiter.length() < 7 || dateNonDelimiter.length() > 14) {
 						validatorResult vr = new validatorResult();
-						vr.setIsValidDate(false);
 						vr.setIsValidFormat(true);
 						vr.setMessage("ERROR: Date is invalid. Invalid length for the input date.");
 						return vr;
@@ -543,7 +509,6 @@ public class ValidatorFormatter implements ValidateFormat {
 									dateNonDelimiter.length());
 						} else {
 							validatorResult vr = new validatorResult();
-							vr.setIsValidDate(false);
 							vr.setIsValidFormat(true);
 							vr.setMessage("ERROR: Date is invalid.");
 							return vr;
@@ -559,7 +524,6 @@ public class ValidatorFormatter implements ValidateFormat {
 							vr.setInputDay(inputDay);
 							vr.setInputMonth(inputMonth);
 							vr.setInputYear(inputYear);
-							vr.setIsValidDate(false);
 							vr.setIsValidFormat(true);
 							vr.setMessage("ERROR: Invalid month value in the input date.");
 							return vr;
@@ -568,7 +532,6 @@ public class ValidatorFormatter implements ValidateFormat {
 							vr.setInputDay(inputDay);
 							vr.setInputMonth(inputMonth);
 							vr.setInputYear(inputYear);
-							vr.setIsValidDate(false);
 							vr.setIsValidFormat(true);
 							vr.setMessage("ERROR: Invalid year value in the input date.");
 							return vr;
@@ -578,7 +541,6 @@ public class ValidatorFormatter implements ValidateFormat {
 							vr.setInputDay(inputDay);
 							vr.setInputMonth(inputMonth);
 							vr.setInputYear(inputYear);
-							vr.setIsValidDate(false);
 							vr.setIsValidFormat(true);
 							vr.setMessage("ERROR: Invalid day value in the input date.");
 							return vr;
@@ -608,7 +570,6 @@ public class ValidatorFormatter implements ValidateFormat {
 				try {
 					if (dateNonDelimiter.length() < 9 || dateNonDelimiter.length() > 16) {
 						validatorResult vr = new validatorResult();
-						vr.setIsValidDate(false);
 						vr.setIsValidFormat(true);
 						vr.setMessage("ERROR: Date is invalid. Invalid length for the input date.");
 						return vr;
@@ -646,7 +607,6 @@ public class ValidatorFormatter implements ValidateFormat {
 									dateNonDelimiter.length());
 						} else {
 							validatorResult vr = new validatorResult();
-							vr.setIsValidDate(false);
 							vr.setIsValidFormat(true);
 							vr.setMessage("ERROR: Date is invalid.");
 							return vr;
@@ -662,7 +622,6 @@ public class ValidatorFormatter implements ValidateFormat {
 							vr.setInputDay(inputDay);
 							vr.setInputMonth(inputMonth);
 							vr.setInputYear(inputYear);
-							vr.setIsValidDate(false);
 							vr.setIsValidFormat(true);
 							vr.setMessage("ERROR: Invalid month value in the input date.");
 							return vr;
@@ -671,7 +630,6 @@ public class ValidatorFormatter implements ValidateFormat {
 							vr.setInputDay(inputDay);
 							vr.setInputMonth(inputMonth);
 							vr.setInputYear(inputYear);
-							vr.setIsValidDate(false);
 							vr.setIsValidFormat(true);
 							vr.setMessage("ERROR: Invalid year value in the input date.");
 							return vr;
@@ -681,7 +639,6 @@ public class ValidatorFormatter implements ValidateFormat {
 							vr.setInputDay(inputDay);
 							vr.setInputMonth(inputMonth);
 							vr.setInputYear(inputYear);
-							vr.setIsValidDate(false);
 							vr.setIsValidFormat(true);
 							vr.setMessage("ERROR: Invalid day value in the input date.");
 							return vr;
