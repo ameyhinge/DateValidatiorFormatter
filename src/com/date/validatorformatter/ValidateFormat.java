@@ -9,7 +9,9 @@ public interface ValidateFormat {
 
 	boolean dayValidator(int day, int month, int year);
 
-	boolean monthValidator(int day);
+	boolean monthValidator(int month);
+
+	String monthValidator(String month, String dateFormatNonDelimiter, Map<String, Integer> monthMap);
 
 	boolean yearValidator(int year);
 

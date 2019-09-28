@@ -41,6 +41,15 @@ public class ValidatorFormatter implements ValidateFormat {
 		numCheck.put('8', '0');
 		numCheck.put('9', '0');
 
+		Map<Character, Character> dateCheck = new HashMap<Character, Character>();
+		dateCheck.put('D', '0');
+		dateCheck.put('M', '0');
+		dateCheck.put('Y', '0');
+
+		Map<Character, Character> delCheck = new HashMap<Character, Character>();
+		delCheck.put('/', '0');
+		delCheck.put('.', '0');
+
 		StringBuilder sbDateFormatNonDelimiter = new StringBuilder();
 		StringBuilder sbDateNonDelimiter = new StringBuilder();
 
@@ -49,27 +58,38 @@ public class ValidatorFormatter implements ValidateFormat {
 		try {
 
 			// Convert to non delimited date format
-			char delimiter;
+			StringBuilder formatDelimiter = new StringBuilder();
 			for (int i = 0; i < inputDateFormat.length(); i++) {
-				if (inputDateFormat.charAt(i) != 'D' && inputDateFormat.charAt(i) != 'M'
-						&& inputDateFormat.charAt(i) != 'Y') {
-					delimiter = inputDateFormat.charAt(i);
-
-				} else {
+				if (!dateCheck.containsKey(inputDateFormat.charAt(i)))
+					formatDelimiter.append(inputDateFormat.charAt(i));
+				else {
 					sbDateFormatNonDelimiter.append(inputDateFormat.charAt(i));
 				}
 			}
+			System.out.println("Delimiter detected in format: " + formatDelimiter);
+			if (formatDelimiter.length() != 2) {
+				throw new Exception("Invalid Date Format: More then 2 delimiters detected.");
+			} else if (formatDelimiter.charAt(0) != formatDelimiter.charAt(1)) {
+				System.out.println("Warning: Different delimiters detected in format. Both will be considered.");
+			}
 
 			// Convert to non delimited date
+			StringBuilder dateDelimiter = new StringBuilder();
 			for (int i = 0; i < inputDate.length(); i++) {
-				if (inputDate.charAt(i) == '.' || inputDate.charAt(i) == '/') {
-					delimiter = inputDate.charAt(i);
-
+				if (!numCheck.containsKey(inputDate.charAt(i))) {
+					dateDelimiter.append(inputDate.charAt(i));
 				} else {
 					sbDateNonDelimiter.append(inputDate.charAt(i));
 				}
 			}
+			System.out.println("Delimiter detected in date: " + dateDelimiter);
 
+			if (dateDelimiter.length() != 2) {
+				throw new Exception("Invalid Date: More then 2 delimiters detected.");
+			} else if (formatDelimiter.charAt(0) != dateDelimiter.charAt(0)
+					|| formatDelimiter.charAt(1) != dateDelimiter.charAt(1)) {
+				System.out.println("Dates do not match : Invalid delimiter");
+			}
 			System.out.println(sbDateFormatNonDelimiter);
 			System.out.println(sbDateNonDelimiter);
 
@@ -84,7 +104,7 @@ public class ValidatorFormatter implements ValidateFormat {
 					|| dateFormatNonDelimiter.equals("MMDDYY") || dateFormatNonDelimiter.equals("MMYYDD")
 					|| dateFormatNonDelimiter.equals("YYDDMM") || dateFormatNonDelimiter.equals("YYMMDD")) {
 				try {
-					if (inputDate.length() != 6)
+					if (dateNonDelimiter.length() != 6)
 						throw new Exception("Error: Date is invalid. Invalid length for the input date.");
 					else {
 
@@ -232,11 +252,7 @@ public class ValidatorFormatter implements ValidateFormat {
 
 						System.out.println(inputDay + " " + inputMonth + " " + inputYear);
 						int ipDay = Integer.parseInt(inputDay);
-						int ipMonth = 0;
-						for (Map.Entry<String, Integer> mon : monthMap.entrySet()) {
-							if (mon.getKey().toString().substring(0, 3).equals(inputMonth.toUpperCase()))
-								ipMonth = mon.getValue();
-						}
+						String ipMonth = inputMonth.toUpperCase();
 						int rawIpYear = Integer.parseInt(inputYear);
 						int ipYear;
 						if (rawIpYear < 50)
@@ -244,11 +260,13 @@ public class ValidatorFormatter implements ValidateFormat {
 						else
 							ipYear = 1900 + rawIpYear;
 
-						if (monthValidator(ipMonth) == false) {
+						String monthValidatorOp;
+						if ((monthValidatorOp = monthValidator(ipMonth, dateFormatNonDelimiter, monthMap))
+								.equals("false")) {
 							throw new Exception("Invalid month in the input date.");
 						} else if (yearValidator(ipYear) == false) {
 							throw new Exception("Invalid year in the input date.");
-						} else if (dayValidator(ipDay, ipMonth, ipYear) == false) {
+						} else if (dayValidator(ipDay, monthMap.get(monthValidatorOp), ipYear) == false) {
 							throw new Exception("Invalid day in the input date.");
 						}
 					}
@@ -295,18 +313,16 @@ public class ValidatorFormatter implements ValidateFormat {
 
 						System.out.println(inputDay + " " + inputMonth + " " + inputYear);
 						int ipDay = Integer.parseInt(inputDay);
-						int ipMonth = 0;
-						for (Map.Entry<String, Integer> mon : monthMap.entrySet()) {
-							if (mon.getKey().toString().substring(0, 3).equals(inputMonth.toUpperCase()))
-								ipMonth = mon.getValue();
-						}
+						String ipMonth = inputMonth.toUpperCase();
 						int ipYear = Integer.parseInt(inputYear);
 
-						if (monthValidator(ipMonth) == false) {
+						String monthValidatorOp;
+						if ((monthValidatorOp = monthValidator(ipMonth, dateFormatNonDelimiter, monthMap))
+								.equals("false")) {
 							throw new Exception("Invalid month in the input date.");
 						} else if (yearValidator(ipYear) == false) {
 							throw new Exception("Invalid year in the input date.");
-						} else if (dayValidator(ipDay, ipMonth, ipYear) == false) {
+						} else if (dayValidator(ipDay, monthMap.get(monthValidatorOp), ipYear) == false) {
 							throw new Exception("Invalid day in the input date.");
 						}
 					}
@@ -359,23 +375,21 @@ public class ValidatorFormatter implements ValidateFormat {
 
 						System.out.println(inputDay + " " + inputMonth + " " + inputYear);
 						int ipDay = Integer.parseInt(inputDay);
-						int ipMonth = 0;
-						for (Map.Entry<String, Integer> mon : monthMap.entrySet()) {
-							if (mon.getKey().toString().equals(inputMonth.toUpperCase()))
-								ipMonth = mon.getValue();
-						}
+						String ipMonth = inputMonth.toUpperCase();
+
 						int rawIpYear = Integer.parseInt(inputYear);
 						int ipYear;
 						if (rawIpYear < 50)
 							ipYear = 2000 + rawIpYear;
 						else
 							ipYear = 1900 + rawIpYear;
-
-						if (monthValidator(ipMonth) == false) {
+						String monthValidatorOp;
+						if ((monthValidatorOp = monthValidator(ipMonth, dateFormatNonDelimiter, monthMap))
+								.equals("false")) {
 							throw new Exception("Invalid month in the input date.");
 						} else if (yearValidator(ipYear) == false) {
 							throw new Exception("Invalid year in the input date.");
-						} else if (dayValidator(ipDay, ipMonth, ipYear) == false) {
+						} else if (dayValidator(ipDay, monthMap.get(monthValidatorOp), ipYear) == false) {
 							throw new Exception("Invalid day in the input date.");
 						}
 					}
@@ -428,11 +442,7 @@ public class ValidatorFormatter implements ValidateFormat {
 
 						System.out.println(inputDay + " " + inputMonth + " " + inputYear);
 						int ipDay = Integer.parseInt(inputDay);
-						int ipMonth = 0;
-						for (Map.Entry<String, Integer> mon : monthMap.entrySet()) {
-							if (mon.getKey().toString().equals(inputMonth.toUpperCase()))
-								ipMonth = mon.getValue();
-						}
+						String ipMonth = inputMonth.toUpperCase();
 						int rawIpYear = Integer.parseInt(inputYear);
 						int ipYear;
 						if (rawIpYear < 50)
@@ -440,11 +450,13 @@ public class ValidatorFormatter implements ValidateFormat {
 						else
 							ipYear = 1900 + rawIpYear;
 
-						if (monthValidator(ipMonth) == false) {
+						String monthValidatorOp;
+						if ((monthValidatorOp = monthValidator(ipMonth, dateFormatNonDelimiter, monthMap))
+								.equals("false")) {
 							throw new Exception("Invalid month in the input date.");
 						} else if (yearValidator(ipYear) == false) {
 							throw new Exception("Invalid year in the input date.");
-						} else if (dayValidator(ipDay, ipMonth, ipYear) == false) {
+						} else if (dayValidator(ipDay, monthMap.get(monthValidatorOp), ipYear) == false) {
 							throw new Exception("Invalid day in the input date.");
 						}
 					}
@@ -483,6 +495,20 @@ public class ValidatorFormatter implements ValidateFormat {
 			return true;
 		else
 			return false;
+	}
+
+	@Override
+	public String monthValidator(String month, String dateFormatNonDelimiter, Map<String, Integer> monthMap) {
+		if (dateFormatNonDelimiter.contains("MMMM") && monthMap.containsKey(month))
+			return month;
+		else if (dateFormatNonDelimiter.contains("MMM") && !dateFormatNonDelimiter.contains("MMMM")) {
+			for (String s : monthMap.keySet()) {
+				if (s.substring(0, 3).equals(month)) {
+					return s;
+				}
+			}
+		}
+		return "false";
 	}
 
 	@Override
