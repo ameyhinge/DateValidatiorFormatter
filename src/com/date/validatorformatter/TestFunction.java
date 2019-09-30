@@ -26,7 +26,7 @@ public class TestFunction {
 
 					ValidateFormat vf = new ValidatorFormatter();
 					validatorResult vr = new validatorResult();
-					vr = vf.validateDate(inputDateFormat, inputDate);
+					// vr = vf.validateDate(inputDateFormat, inputDate);
 
 					// Display whole output
 					System.out.println("Input day :" + vr.getInputDay());
@@ -49,6 +49,23 @@ public class TestFunction {
 
 					ValidateFormat vf = new ValidatorFormatter();
 					vf.formatDate(inputDateFormat, inputDate, outputDateFormat);
+				} else if (choice.equals("3")) {
+					System.out.println("Enter input date format:");
+					String inputDateFormat = br.readLine();
+
+					System.out.println("Enter the date to be validated:");
+					String inputDate = br.readLine();
+
+					validatorResult vr = new validatorResult();
+					ValidateFormat vf = new ValidatorFormatter();
+					vr = vf.newValidateDate(inputDateFormat, inputDate);
+
+					System.out.println("Input day :" + vr.getInputDay());
+					System.out.println("Input month :" + vr.getInputMonth());
+					System.out.println("Input year: " + vr.getInputYear());
+					System.out.println("Is date valid: " + vr.getIsValidDate());
+					System.out.println("Is format valid: " + vr.getIsValidFormat());
+					System.out.println("Message: " + vr.getMessage());
 				} else {
 					System.out.println("Invalid choice");
 				}
