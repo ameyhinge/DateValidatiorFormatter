@@ -265,32 +265,32 @@ public class ValidatorFormatter implements ValidateFormat {
 					if (DEBUG_MODE == '1') {
 						System.out.println("Checking MM at index 1");
 					}
-					monthReturned = monthValidator(dateNonDelimiter.substring(0, 2), NUM_CHECK);
+					monthReturned = monthValidator(dateNonDelimiter.substring(0, 2), dateFormatNonDelimiter);
 				} else if (inputMonthIndex == '2' && inputDayIndex == '1') {
 					if (DEBUG_MODE == '1') {
 						System.out.println("Checking MM at index 2");
 					}
-					monthReturned = monthValidator(dateNonDelimiter.substring(2, 4), NUM_CHECK);
+					monthReturned = monthValidator(dateNonDelimiter.substring(2, 4), dateFormatNonDelimiter);
 				} else if (inputMonthIndex == '2' && inputYearIndex == '1' && inputYearFormat.length() == 2) {
 					if (DEBUG_MODE == '1') {
 						System.out.println("Checking MM at index 2");
 					}
-					monthReturned = monthValidator(dateNonDelimiter.substring(2, 4), NUM_CHECK);
+					monthReturned = monthValidator(dateNonDelimiter.substring(2, 4), dateFormatNonDelimiter);
 				} else if (inputMonthIndex == '2' && inputYearIndex == '1' && inputYearFormat.length() == 4) {
 					if (DEBUG_MODE == '1') {
 						System.out.println("Checking MM at index 2");
 					}
-					monthReturned = monthValidator(dateNonDelimiter.substring(4, 6), NUM_CHECK);
+					monthReturned = monthValidator(dateNonDelimiter.substring(4, 6), dateFormatNonDelimiter);
 				} else if (inputMonthIndex == '3' && inputYearFormat.length() == 2) {
 					if (DEBUG_MODE == '1') {
 						System.out.println("Checking MM at index 3");
 					}
-					monthReturned = monthValidator(dateNonDelimiter.substring(4, 6), NUM_CHECK);
+					monthReturned = monthValidator(dateNonDelimiter.substring(4, 6), dateFormatNonDelimiter);
 				} else if (inputMonthIndex == '3' && inputYearFormat.length() == 4) {
 					if (DEBUG_MODE == '1') {
 						System.out.println("Checking MM at index 3");
 					}
-					monthReturned = monthValidator(dateNonDelimiter.substring(6, 8), NUM_CHECK);
+					monthReturned = monthValidator(dateNonDelimiter.substring(6, 8), dateFormatNonDelimiter);
 				}
 			} else if (inputMonthFormat.length() == 3) {
 				if (inputMonthIndex == '1') {
@@ -606,37 +606,6 @@ public class ValidatorFormatter implements ValidateFormat {
 		}
 	}
 
-	private String monthValidator(String month, Map<Character, Character> NUM_CHECK) {
-
-		if (DEBUG_MODE == '1') {
-			System.out.println("Numeric Month validator called.");
-		}
-		// Check if month values are numeric
-		for (int i = 0; i < month.length(); i++) {
-			if (!NUM_CHECK.containsKey(month.charAt(i))) {
-				if (DEBUG_MODE == '1') {
-					System.out.println("Month validation failed.");
-				}
-				return "false";
-			}
-		}
-		if (Integer.parseInt(month) < 13 && Integer.parseInt(month) > 0) {
-			if (DEBUG_MODE == '1') {
-				System.out.println("Month validated successfully.");
-			}
-			for (Map.Entry<String, Integer> e : MONTH_MAP.entrySet()) {
-				if (e.getValue() == Integer.parseInt(month))
-					return e.getKey();
-			}
-		} else {
-			if (DEBUG_MODE == '1') {
-				System.out.println("Month validation failed.");
-			}
-			return "false";
-		}
-		return month;
-	}
-
 	private String monthValidator(String month, String dateFormatNonDelimiter) {
 
 		if (DEBUG_MODE == '1') {
@@ -645,8 +614,8 @@ public class ValidatorFormatter implements ValidateFormat {
 		if (dateFormatNonDelimiter.toUpperCase().contains("MMMM") && MONTH_MAP.containsKey(month.toUpperCase())) {
 			if (DEBUG_MODE == '1') {
 				System.out.println("Month validated successfully.");
+				return month.toUpperCase();
 			}
-			return month.toUpperCase();
 		} else if (dateFormatNonDelimiter.toUpperCase().contains("MMM")
 				&& !dateFormatNonDelimiter.toUpperCase().contains("MMMM")) {
 			for (String s : MONTH_MAP.keySet()) {
@@ -655,6 +624,29 @@ public class ValidatorFormatter implements ValidateFormat {
 						System.out.println("Month validated successfully.");
 					}
 					return s;
+				}
+			}
+		}
+		// Check if month values are numeric
+		else {
+			if (DEBUG_MODE == '1') {
+				System.out.println("Numeric Month validator called.");
+			}
+			for (int i = 0; i < month.length(); i++) {
+				if (!NUM_CHECK.containsKey(month.charAt(i))) {
+					if (DEBUG_MODE == '1') {
+						System.out.println("Month validation failed.");
+					}
+					return "false";
+				}
+			}
+			if (Integer.parseInt(month) < 13 && Integer.parseInt(month) > 0) {
+				if (DEBUG_MODE == '1') {
+					System.out.println("Month validated successfully.");
+				}
+				for (Map.Entry<String, Integer> e : MONTH_MAP.entrySet()) {
+					if (e.getValue() == Integer.parseInt(month))
+						return e.getKey();
 				}
 			}
 		}
