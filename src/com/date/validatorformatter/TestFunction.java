@@ -25,7 +25,7 @@ public class TestFunction {
 					String inputDate = br.readLine();
 
 					ValidateFormat vf = new ValidatorFormatter();
-					validatorResult vr = new validatorResult();
+					ValidatorResult vr = new ValidatorResult();
 					// vr = vf.validateDate(inputDateFormat, inputDate);
 
 					// Display whole output
@@ -56,7 +56,7 @@ public class TestFunction {
 					System.out.println("Enter the date to be validated:");
 					String inputDate = br.readLine();
 
-					validatorResult vr = new validatorResult();
+					ValidatorResult vr = new ValidatorResult();
 					ValidateFormat vf = new ValidatorFormatter();
 					vr = vf.newValidateDate(inputDateFormat, inputDate);
 

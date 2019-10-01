@@ -5,5 +5,5 @@ public interface ValidateFormat {
 
 	//validatorResult validateDate(String inputDateFormat, String inputDate);
 
-	validatorResult newValidateDate(String inputDateFormat, String inputDate);
+	ValidatorResult newValidateDate(String inputDateFormat, String inputDate);
 }
