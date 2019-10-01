@@ -48,10 +48,20 @@ public class ValidatorFormatter implements ValidateFormat {
 		YEAR_FORMATS.put("YYYY", '0');
 	}
 
+	private static Map<Character, Character> DATE_CHECK = new HashMap<Character, Character>();
+	static {
+		DATE_CHECK.put('D', '0');
+		DATE_CHECK.put('M', '0');
+		DATE_CHECK.put('Y', '0');
+	}
+
 	static char DEBUG_MODE = '1';
 
 	@Override
 	public String formatDate(String inputDateFormat, String inputDate, String outputDateFormat) {
+
+		// String builder for output date
+		StringBuilder sbOutputDate = new StringBuilder();
 
 		// Validate input date format and input date
 		ValidatorResult vr = new ValidatorResult();
@@ -60,178 +70,164 @@ public class ValidatorFormatter implements ValidateFormat {
 			if (DEBUG_MODE == '1') {
 				System.out.println(vr.getMessage());
 			}
+		} else {
+			System.out.println("ERROR: Input Date and Date format do not match.");
 		}
-		vr = new ValidatorResult();
 
-		vr = newValidateDate(outputDateFormat, "");
-		if (vr.getIsValidFormat() == true) {
-			if (DEBUG_MODE == '1') {
-				System.out.println(vr.getMessage());
+		// Validate output date format
+		FormatDetails fd = new FormatDetails();
+		fd = formatProcessor(outputDateFormat);
+
+		if (fd.getFormatValid() == true) {
+
+			// Build if first part is day
+			if (fd.getDayIndex() == '1') {
+				sbOutputDate.append(vr.getInputDay());
+				// Append delimiter
+				if (fd.getFormatDelimiter().length() == 2) {
+					sbOutputDate.append(fd.getFormatDelimiter().charAt(0));
+				}
+				// Build the second and third part
+				char index = '2';
+				while (index == '2' || index == '3') {
+					if (fd.getMonthIndex() == index && fd.getMonthFormat().length() == 2) {
+						if (MONTH_MAP.get(vr.getInputMonth()) < 9) {
+							sbOutputDate.append("0");
+						}
+						sbOutputDate.append(MONTH_MAP.get(vr.getInputMonth()));
+					} else if (fd.getMonthIndex() == index && fd.getMonthFormat().length() == 3) {
+						sbOutputDate.append(vr.getInputMonth().substring(0, 3));
+					} else if (fd.getMonthIndex() == index && fd.getMonthFormat().length() == 4) {
+						sbOutputDate.append(vr.getInputMonth());
+					} else if (fd.getYearIndex() == index && fd.getYearFormat().length() == 2) {
+						sbOutputDate.append(vr.getInputYear().substring(2, 4));
+					} else if (fd.getYearIndex() == index && fd.getYearFormat().length() == 4) {
+						sbOutputDate.append(vr.getInputYear());
+					}
+					// Append delimiter
+					if (index == '2' && fd.getFormatDelimiter().length() == 2) {
+						sbOutputDate.append(fd.getFormatDelimiter().charAt(0));
+					}
+					index = (char) ((int) index + 1);
+				}
 			}
+
+			// Build if first part is month
+			if (fd.getMonthIndex() == '1') {
+				// Build the first part
+				if (fd.getMonthFormat().length() == 2) {
+					if (MONTH_MAP.get(vr.getInputMonth()) < 9) {
+						sbOutputDate.append("0");
+					}
+					sbOutputDate.append(MONTH_MAP.get(vr.getInputMonth()));
+				} else if (fd.getMonthFormat().length() == 3) {
+					sbOutputDate.append(vr.getInputMonth().substring(0, 3));
+				} else if (fd.getMonthFormat().length() == 4) {
+					sbOutputDate.append(vr.getInputMonth());
+				}
+				// Append delimiter
+				if (fd.getFormatDelimiter().length() == 2) {
+					sbOutputDate.append(fd.getFormatDelimiter().charAt(0));
+				}
+				// Build the second and third part
+				char index = '2';
+				while (index == '2' || index == '3') {
+					if (fd.getDayIndex() == index) {
+						sbOutputDate.append(vr.getInputDay());
+					} else if (fd.getYearIndex() == index && fd.getYearFormat().length() == 2) {
+						sbOutputDate.append(vr.getInputYear().substring(2, 4));
+					} else if (fd.getYearIndex() == index && fd.getYearFormat().length() == 4) {
+						sbOutputDate.append(vr.getInputYear());
+					}
+					// Append delimiter
+					if (index == '2' && fd.getFormatDelimiter().length() == 2) {
+						sbOutputDate.append(fd.getFormatDelimiter().charAt(0));
+					}
+					index = (char) ((int) index + 1);
+				}
+			}
+
+			// Build if first part is year
+			if (fd.getYearIndex() == '1') {
+				// Build the first part
+				if (fd.getYearFormat().length() == 2) {
+					sbOutputDate.append(vr.getInputYear().substring(2, 4));
+				} else if (fd.getYearFormat().length() == 4) {
+					sbOutputDate.append(vr.getInputYear());
+				}
+				// Append delimiter
+				if (fd.getFormatDelimiter().length() == 2) {
+					sbOutputDate.append(fd.getFormatDelimiter().charAt(0));
+				}
+				// Build the second and third part
+				char index = '2';
+				while (index == '2' || index == '3') {
+					if (fd.getDayIndex() == index) {
+						sbOutputDate.append(vr.getInputDay());
+					} else if (fd.getMonthIndex() == index && fd.getMonthFormat().length() == 2) {
+						if (MONTH_MAP.get(vr.getInputMonth()) < 9) {
+							sbOutputDate.append("0");
+						}
+						sbOutputDate.append(MONTH_MAP.get(vr.getInputMonth()));
+					} else if (fd.getMonthIndex() == index && fd.getMonthFormat().length() == 3) {
+						sbOutputDate.append(vr.getInputMonth().substring(0, 3));
+					} else if (fd.getMonthIndex() == index && fd.getMonthFormat().length() == 4) {
+						sbOutputDate.append(vr.getInputMonth());
+					} else if (fd.getYearIndex() == index && fd.getYearFormat().length() == 2) {
+						sbOutputDate.append(vr.getInputYear().substring(2, 4));
+					} else if (fd.getYearIndex() == index && fd.getYearFormat().length() == 4) {
+						sbOutputDate.append(vr.getInputYear());
+					}
+					// Append delimiter
+					if (index == '2' && fd.getFormatDelimiter().length() == 2) {
+						sbOutputDate.append(fd.getFormatDelimiter().charAt(0));
+					}
+					index = (char) ((int) index + 1);
+				}
+			}
+			System.out.println(sbOutputDate);
+
+		} else {
+			return "ERROR: Invalid output format";
 		}
 
-		// Pick day month and year form output format
-
-		return null;
+		return sbOutputDate.toString();
 	}
 
 	@Override
 	public ValidatorResult newValidateDate(String inputDateFormat, String inputDate) {
-
-		Map<Character, Character> dateCheck = new HashMap<Character, Character>();
-		dateCheck.put('D', '0');
-		dateCheck.put('M', '0');
-		dateCheck.put('Y', '0');
 
 		Map<Character, Character> delimiterCheck = new HashMap<Character, Character>();
 		delimiterCheck.put('/', '0');
 		delimiterCheck.put('.', '0');
 		delimiterCheck.put(' ', '0');
 
-		StringBuilder sbDateFormatNonDelimiter = new StringBuilder();
-		StringBuilder sbFormatDelimiter = new StringBuilder();
+		// Validate format
+		FormatDetails fd = new FormatDetails();
+		fd = formatProcessor(inputDateFormat);
 
-		// Get input format and delimiters
-		for (int i = 0; i < inputDateFormat.length(); i++) {
-			if (!dateCheck.containsKey(inputDateFormat.toUpperCase().charAt(i))) {
-				sbFormatDelimiter.append(inputDateFormat.charAt(i));
-			} else {
-				sbDateFormatNonDelimiter.append(inputDateFormat.charAt(i));
-			}
-		}
-
-		String dateFormatNonDelimiter = sbDateFormatNonDelimiter.toString();
-
-		if (DEBUG_MODE == '1') {
-			System.out.println("Seperator in format: " + sbFormatDelimiter);
-		}
-
-		// String of stringbuilders to hold the different parts of format
-		StringBuilder[] sbFormatParts = new StringBuilder[3];
-		int j = 0;
-
-		for (int i = 0; i < dateFormatNonDelimiter.length(); i++) {
-			if (i == 0) {
-				sbFormatParts[j] = new StringBuilder();
-				sbFormatParts[j].append(dateFormatNonDelimiter.charAt(i));
-			} else if (dateFormatNonDelimiter.charAt(i) == dateFormatNonDelimiter.charAt(i - 1)) {
-				sbFormatParts[j].append(dateFormatNonDelimiter.charAt(i));
-			} else {
-				j++;
-				sbFormatParts[j] = new StringBuilder();
-				sbFormatParts[j].append(dateFormatNonDelimiter.charAt(i));
-			}
-		}
-
-		String inputDayFormat = new String();
-		String inputMonthFormat = new String();
-		String inputYearFormat = new String();
-		char inputDayIndex = '0';
-		char inputMonthIndex = '0';
-		char inputYearIndex = '0';
-
-		// Create object to return
 		ValidatorResult vr = new ValidatorResult();
-
-		// Identify first part
-		if (sbFormatParts[0] != null) {
-			if (sbFormatParts[0].toString().toUpperCase().charAt(0) == 'D') {
-				inputDayFormat = sbFormatParts[0].toString().toUpperCase();
-				inputDayIndex = '1';
-				if (DEBUG_MODE == '1') {
-					System.out.println("Day format: " + inputDayFormat + " found at index: " + inputDayIndex);
-				}
-			} else if (sbFormatParts[0].toString().toUpperCase().charAt(0) == 'M') {
-				inputMonthFormat = sbFormatParts[0].toString().toUpperCase();
-				inputMonthIndex = '1';
-				if (DEBUG_MODE == '1') {
-					System.out.println("Month format: " + inputMonthFormat + " found at index: " + inputMonthIndex);
-				}
-			} else {
-				inputYearFormat = sbFormatParts[0].toString().toUpperCase();
-				inputYearIndex = '1';
-				if (DEBUG_MODE == '1') {
-					System.out.println("Year format: " + inputYearFormat + " found at index: " + inputYearIndex);
-				}
-			}
+		if (fd.getFormatValid() == true) {
+			vr.setIsValidFormat(true);
 		} else {
-			vr.setMessage("ERROR: Invalid date format.");
+			vr.setMessage(fd.getMessage());
 			return vr;
 		}
 
-		// Identify second part
-		if (sbFormatParts[1] != null) {
-			if (sbFormatParts[1].toString().toUpperCase().charAt(0) == 'D') {
-				inputDayFormat = sbFormatParts[1].toString().toUpperCase();
-				inputDayIndex = '2';
-				if (DEBUG_MODE == '1') {
-					System.out.println("Day format: " + inputDayFormat + " found at index: " + inputDayIndex);
-				}
-			} else if (sbFormatParts[1].toString().toUpperCase().charAt(0) == 'M') {
-				inputMonthFormat = sbFormatParts[1].toString().toUpperCase();
-				inputMonthIndex = '2';
-				if (DEBUG_MODE == '1') {
-					System.out.println("Month format: " + inputMonthFormat + " found at index: " + inputMonthIndex);
-				}
-			} else {
-				inputYearFormat = sbFormatParts[1].toString().toUpperCase();
-				inputYearIndex = '2';
-				if (DEBUG_MODE == '1') {
-					System.out.println("Year format: " + inputYearFormat + " found at index: " + inputYearIndex);
-				}
-			}
-		} else {
-			vr.setMessage("ERROR: Invalid date format.");
-			return vr;
-		}
+		String inputMonthFormat = fd.getMonthFormat();
+		String inputYearFormat = fd.getYearFormat();
 
-		// Identify third part
-		if (sbFormatParts[2] != null) {
-			if (sbFormatParts[2].toString().toUpperCase().charAt(0) == 'D') {
-				inputDayFormat = sbFormatParts[2].toString().toUpperCase();
-				inputDayIndex = '3';
-				if (DEBUG_MODE == '1') {
-					System.out.println("Day format: " + inputDayFormat + " found at index: " + inputDayIndex);
-				}
-			} else if (sbFormatParts[2].toString().toUpperCase().charAt(0) == 'M') {
-				inputMonthFormat = sbFormatParts[2].toString().toUpperCase();
-				inputMonthIndex = '3';
-				if (DEBUG_MODE == '1') {
-					System.out.println("Month format: " + inputMonthFormat + " found at index: " + inputMonthIndex);
-				}
-			} else {
-				inputYearFormat = sbFormatParts[2].toString().toUpperCase();
-				inputYearIndex = '3';
-				if (DEBUG_MODE == '1') {
-					System.out.println("Year format: " + inputYearFormat + " found at index: " + inputYearIndex);
-				}
-			}
-		} else {
-			vr.setMessage("ERROR: Invalid date format.");
-			return vr;
-		}
+		char inputMonthIndex = fd.getMonthIndex();
+		char inputYearIndex = fd.getYearIndex();
+		char inputDayIndex = fd.getDayIndex();
 
-		// Day Month Year Format validations
-		if (!MONTH_FORMATS.containsKey(inputMonthFormat)) {
-			vr.setMessage("ERROR: Invalid month format.");
-			return vr;
-		}
-		if (!YEAR_FORMATS.containsKey(inputYearFormat)) {
-			vr.setMessage("ERROR: Invalid year format.");
-			return vr;
-		}
-		if (!inputDayFormat.equals("DD")) {
-			vr.setMessage("ERROR: Invalid day format.");
-			return vr;
-		}
+		String dateFormatNonDelimiter = fd.getFormat();
+		String formatDelimiter = fd.getFormatDelimiter();
 
-		// Format validations done so setting format valid as true
-		vr.setIsValidFormat(true);
-
+		// Get input date and delimiters
 		StringBuilder sbDateDelimiter = new StringBuilder();
 		StringBuilder sbDateNonDelimiter = new StringBuilder();
 
-		// Get input date and delimiters
 		for (int i = 0; i < inputDate.length(); i++) {
 			if (delimiterCheck.containsKey(inputDate.charAt(i))) {
 				sbDateDelimiter.append(inputDate.charAt(i));
@@ -248,7 +244,7 @@ public class ValidatorFormatter implements ValidateFormat {
 
 		// Input date length validation
 		if (dateNonDelimiter.length() < 5) {
-			vr.setMessage("ERROR: Invalid length for the input date");
+			vr.setMessage("ERROR: Invalid length for the input date.");
 			return vr;
 		}
 
@@ -551,7 +547,7 @@ public class ValidatorFormatter implements ValidateFormat {
 		}
 		// Date validations done so setting date valid as true
 		vr.setIsValidDate(true);
-		if (sbFormatDelimiter.toString().equals(sbDateDelimiter.toString())) {
+		if (formatDelimiter.equals(sbDateDelimiter.toString())) {
 			vr.setMessage("INFO: Date validated successfully.");
 		} else {
 			vr.setMessage("ERROR: Date valid but seperators do not match.");
@@ -705,10 +701,221 @@ public class ValidatorFormatter implements ValidateFormat {
 		}
 		return sbMonth.toString();
 	}
+
+	private FormatDetails formatProcessor(String inputDateFormat) {
+
+		StringBuilder sbDateFormatNonDelimiter = new StringBuilder();
+		StringBuilder sbFormatDelimiter = new StringBuilder();
+
+		// Make the object to return
+		FormatDetails fd = new FormatDetails();
+
+		// Get input format and delimiters
+		for (int i = 0; i < inputDateFormat.length(); i++) {
+			if (!DATE_CHECK.containsKey(inputDateFormat.toUpperCase().charAt(i))) {
+				sbFormatDelimiter.append(inputDateFormat.charAt(i));
+			} else {
+				sbDateFormatNonDelimiter.append(inputDateFormat.charAt(i));
+			}
+		}
+		fd.setFormat(sbDateFormatNonDelimiter.toString().toUpperCase());
+		fd.setFormatDelimiter(sbFormatDelimiter.toString().toUpperCase());
+
+		// Extract the parts, index and validate
+		StringBuilder[] sbFormatParts = new StringBuilder[3];
+		int j = 0;
+
+		for (int i = 0; i < fd.getFormat().length(); i++) {
+			if (i == 0) {
+				sbFormatParts[j] = new StringBuilder();
+				sbFormatParts[j].append(fd.getFormat().charAt(i));
+			} else if (fd.getFormat().charAt(i) == fd.getFormat().charAt(i - 1)) {
+				sbFormatParts[j].append(fd.getFormat().charAt(i));
+			} else {
+				j++;
+				sbFormatParts[j] = new StringBuilder();
+				sbFormatParts[j].append(fd.getFormat().charAt(i));
+			}
+		}
+
+		// Identify and validate first part
+		if (sbFormatParts[0] != null) {
+			if (sbFormatParts[0].toString().equals("DD")) {
+				fd.setDayIndex('1');
+				if (DEBUG_MODE == '1') {
+					System.out.println("Day format: " + "DD " + " found at index: " + fd.getDayIndex());
+				}
+			} else if (MONTH_FORMATS.containsKey(sbFormatParts[0].toString())) {
+				fd.setMonthFormat(sbFormatParts[0].toString());
+				fd.setMonthIndex('1');
+				if (DEBUG_MODE == '1') {
+					System.out
+							.println("Month format: " + fd.getMonthFormat() + " found at index: " + fd.getMonthIndex());
+				}
+			} else if (YEAR_FORMATS.containsKey(sbFormatParts[0].toString())) {
+				fd.setYearFormat(sbFormatParts[0].toString());
+				fd.setYearIndex('1');
+				if (DEBUG_MODE == '1') {
+					System.out.println("Year format: " + fd.getYearFormat() + " found at index: " + fd.getYearIndex());
+				}
+			} else {
+				fd.setMessage("ERROR: Invalid date format.");
+				return fd;
+			}
+		} else {
+			fd.setMessage("ERROR: Invalid date format.");
+			return fd;
+		}
+
+		// Identify and validate second part
+		if (sbFormatParts[1] != null) {
+			if (sbFormatParts[1].toString().equals("DD")) {
+				fd.setDayIndex('2');
+				if (DEBUG_MODE == '1') {
+					System.out.println("Day format: " + "DD " + " found at index: " + fd.getDayIndex());
+				}
+			} else if (MONTH_FORMATS.containsKey(sbFormatParts[1].toString())) {
+				fd.setMonthFormat(sbFormatParts[1].toString());
+				fd.setMonthIndex('2');
+				if (DEBUG_MODE == '1') {
+					System.out
+							.println("Month format: " + fd.getMonthFormat() + " found at index: " + fd.getMonthIndex());
+				}
+			} else if (YEAR_FORMATS.containsKey(sbFormatParts[1].toString())) {
+				fd.setYearFormat(sbFormatParts[1].toString());
+				fd.setYearIndex('2');
+				if (DEBUG_MODE == '1') {
+					System.out.println("Year format: " + fd.getYearFormat() + " found at index: " + fd.getYearIndex());
+				}
+			} else {
+				fd.setMessage("ERROR: Invalid date format.");
+				return fd;
+			}
+		} else {
+			fd.setMessage("ERROR: Invalid date format.");
+			return fd;
+		}
+
+		// Identify and validate third part
+		if (sbFormatParts[2] != null) {
+			if (sbFormatParts[2].toString().equals("DD")) {
+				fd.setDayIndex('3');
+				if (DEBUG_MODE == '1') {
+					System.out.println("Day format: " + "DD " + " found at index: " + fd.getDayIndex());
+				}
+			} else if (MONTH_FORMATS.containsKey(sbFormatParts[2].toString())) {
+				fd.setMonthFormat(sbFormatParts[2].toString());
+				fd.setMonthIndex('3');
+				if (DEBUG_MODE == '1') {
+					System.out
+							.println("Month format: " + fd.getMonthFormat() + " found at index: " + fd.getMonthIndex());
+				}
+			} else if (YEAR_FORMATS.containsKey(sbFormatParts[2].toString())) {
+				fd.setYearFormat(sbFormatParts[2].toString());
+				fd.setYearIndex('3');
+				if (DEBUG_MODE == '1') {
+					System.out.println("Year format: " + fd.getYearFormat() + " found at index: " + fd.getYearIndex());
+				}
+			} else {
+				fd.setMessage("ERROR: Invalid date format.");
+				return fd;
+			}
+		} else {
+			fd.setMessage("ERROR: Invalid date format.");
+			return fd;
+		}
+
+		// Everything valid, set validity = true and return the object
+		fd.setFormatValid(true);
+		return fd;
+	}
+}
+
+class FormatDetails {
+	private String monthFormat;
+	private String yearFormat;
+	private char dayIndex;
+	private char monthIndex;
+	private char yearIndex;
+	private boolean formatValid;
+	private String message;
+	private String format;
+	private String formatDelimiter;
+
+	public String getMonthFormat() {
+		return monthFormat;
+	}
+
+	public void setMonthFormat(String monthFormat) {
+		this.monthFormat = monthFormat;
+	}
+
+	public String getYearFormat() {
+		return yearFormat;
+	}
+
+	public void setYearFormat(String yearFormat) {
+		this.yearFormat = yearFormat;
+	}
+
+	public char getDayIndex() {
+		return dayIndex;
+	}
+
+	public void setDayIndex(char dayIndex) {
+		this.dayIndex = dayIndex;
+	}
+
+	public char getMonthIndex() {
+		return monthIndex;
+	}
+
+	public void setMonthIndex(char monthIndex) {
+		this.monthIndex = monthIndex;
+	}
+
+	public char getYearIndex() {
+		return yearIndex;
+	}
+
+	public void setYearIndex(char yearIndex) {
+		this.yearIndex = yearIndex;
+	}
+
+	public boolean getFormatValid() {
+		return formatValid;
+	}
+
+	public void setFormatValid(boolean formatValid) {
+		this.formatValid = formatValid;
+	}
+
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public String getFormat() {
+		return format;
+	}
+
+	public void setFormat(String format) {
+		this.format = format;
+	}
+
+	public String getFormatDelimiter() {
+		return formatDelimiter;
+	}
+
+	public void setFormatDelimiter(String formatDelimiter) {
+		this.formatDelimiter = formatDelimiter;
+	}
 }
 
 class ValidatorResult {
-
 	private String inputDay;
 	private String inputMonth;
 	private String inputYear;
