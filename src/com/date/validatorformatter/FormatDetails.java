@@ -1,6 +1,7 @@
 package com.date.validatorformatter;
 
 public class FormatDetails {
+	private String dayFormat;
 	private String monthFormat;
 	private String yearFormat;
 	private char dayIndex;
@@ -10,6 +11,14 @@ public class FormatDetails {
 	private String message;
 	private String format;
 	private String formatDelimiter;
+
+	public String getDayFormat() {
+		return dayFormat;
+	}
+
+	public void setDayFormat(String dayFormat) {
+		this.dayFormat = dayFormat;
+	}
 
 	public String getMonthFormat() {
 		return monthFormat;
