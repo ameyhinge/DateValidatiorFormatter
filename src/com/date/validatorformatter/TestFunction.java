@@ -48,6 +48,21 @@ public class TestFunction {
 
 					ValidateFormat vf = new ValidatorFormatter();
 					vf.formatDate(inputDateFormat, inputDate, outputDateFormat);
+				} else if (choice.equals("3")) {
+					System.out.println("Enter input date format:");
+					String inputDateFormat = br.readLine();
+
+					System.out.println("Enter the date to be validated:");
+					String inputDate = br.readLine();
+
+					System.out.println("Enter quantity:");
+					String quantity = br.readLine();
+
+					System.out.println("Enter unit:");
+					String unit = br.readLine();
+
+					ValidateFormat vf = new ValidatorFormatter();
+					vf.incrementDate(inputDateFormat, inputDate, quantity, unit);
 				} else {
 					System.out.println("Invalid choice");
 				}

@@ -4,6 +4,9 @@ public class ValidatorResult {
 	private String inputDay;
 	private String inputMonth;
 	private String inputYear;
+	private char dayIndex;
+	private char monthIndex;
+	private char yearIndex;
 	private boolean isValidDate;
 	private boolean isValidFormat;
 	private String message;
@@ -30,6 +33,30 @@ public class ValidatorResult {
 
 	public void setInputYear(String inputYear) {
 		this.inputYear = inputYear;
+	}
+
+	public char getDayIndex() {
+		return dayIndex;
+	}
+
+	public void setDayIndex(char dayIndex) {
+		this.dayIndex = dayIndex;
+	}
+
+	public char getMonthIndex() {
+		return monthIndex;
+	}
+
+	public void setMonthIndex(char monthIndex) {
+		this.monthIndex = monthIndex;
+	}
+
+	public char getYearIndex() {
+		return yearIndex;
+	}
+
+	public void setYearIndex(char yearIndex) {
+		this.yearIndex = yearIndex;
 	}
 
 	public boolean getIsValidDate() {

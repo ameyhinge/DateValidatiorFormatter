@@ -21,20 +21,6 @@ public class ValidatorFormatter implements ValidateFormat {
 		MONTH_MAP.put("DECEMBER", 12);
 	}
 
-	private static Map<Character, Character> NUM_CHECK = new HashMap<Character, Character>();
-	static {
-		NUM_CHECK.put('0', '0');
-		NUM_CHECK.put('1', '0');
-		NUM_CHECK.put('2', '0');
-		NUM_CHECK.put('3', '0');
-		NUM_CHECK.put('4', '0');
-		NUM_CHECK.put('5', '0');
-		NUM_CHECK.put('6', '0');
-		NUM_CHECK.put('7', '0');
-		NUM_CHECK.put('8', '0');
-		NUM_CHECK.put('9', '0');
-	}
-
 	private static Map<String, Character> DAY_FORMATS = new HashMap<String, Character>();
 	static {
 		DAY_FORMATS.put("D", '0');
@@ -55,6 +41,10 @@ public class ValidatorFormatter implements ValidateFormat {
 		YEAR_FORMATS.put("YYYY", '0');
 	}
 
+	private static String[] MONTH_31 = { "JANUARY", "MARCH", "MAY", "JULY", "AUGUST", "OCTOBER", "DECEMBER" };
+	private static String[] MONTH_30 = { "APRIL", "JUNE", "SEPTEMBER", "NOVEMBER" };
+	private static String MONTH_02 = "FEBURARY";
+
 	private static Map<Character, Character> DATE_CHECK = new HashMap<Character, Character>();
 	static {
 		DATE_CHECK.put('D', '0');
@@ -63,6 +53,22 @@ public class ValidatorFormatter implements ValidateFormat {
 	}
 
 	static char DEBUG_MODE = '1';
+
+	@Override
+	public String incrementDate(String inputDateFormat, String inputDate, String quantity, String unit) {
+
+		// Validate the date and format
+		ValidatorResult vr = new ValidatorResult();
+		vr = validateDate(inputDateFormat, inputDate);
+		if (vr.getIsValidDate() == true && vr.getIsValidFormat() == true) {
+			debugPrint(vr.getMessage());
+		} else {
+			return "ERROR: Input Date and Date format do not match.";
+		}
+
+		monthType(vr.getInputMonth());
+		return "yay";
+	}
 
 	@Override
 	public String formatDate(String inputDateFormat, String inputDate, String outputDateFormat) {
@@ -76,7 +82,7 @@ public class ValidatorFormatter implements ValidateFormat {
 		if (vr.getIsValidDate() == true && vr.getIsValidFormat() == true) {
 			debugPrint(vr.getMessage());
 		} else {
-			System.out.println("ERROR: Input Date and Date format do not match.");
+			return "ERROR: Input Date and Date format do not match.";
 		}
 
 		// Validate output date format
@@ -210,6 +216,9 @@ public class ValidatorFormatter implements ValidateFormat {
 		ValidatorResult vr = new ValidatorResult();
 		if (fd.getFormatValid() == true) {
 			vr.setIsValidFormat(true);
+			vr.setDayIndex(fd.getDayIndex());
+			vr.setMonthIndex(fd.getMonthIndex());
+			vr.setYearIndex(fd.getYearIndex());
 		} else {
 			vr.setMessage(fd.getMessage());
 			return vr;
@@ -258,25 +267,25 @@ public class ValidatorFormatter implements ValidateFormat {
 				if (inputMonthIndex == '1') {
 					debugPrint("Checking Month at index 1");
 					monthReturned = monthValidator(dateNonDelimiter.substring(0, inputMonthFormat.length()),
-							dateFormatNonDelimiter);
+							inputMonthFormat);
 				} else if (inputMonthIndex == '2' && inputDayIndex == '1') {
 					debugPrint("Checking Month at index 2");
 					monthReturned = monthValidator(dateNonDelimiter.substring(inputDayFormat.length(),
-							inputDayFormat.length() + inputMonthFormat.length()), dateFormatNonDelimiter);
+							inputDayFormat.length() + inputMonthFormat.length()), inputMonthFormat);
 				} else if (inputMonthIndex == '2' && inputYearIndex == '1') {
 					debugPrint("Checking Month at index 2");
 					monthReturned = monthValidator(dateNonDelimiter.substring(inputYearFormat.length(),
-							inputYearFormat.length() + inputMonthFormat.length()), dateFormatNonDelimiter);
+							inputYearFormat.length() + inputMonthFormat.length()), inputMonthFormat);
 				} else if (inputMonthIndex == '3') {
 					debugPrint("Checking Month at index 3");
 					monthReturned = monthValidator(dateNonDelimiter
 							.substring(inputDayFormat.length() + inputYearFormat.length(), dateNonDelimiter.length()),
-							dateFormatNonDelimiter);
+							inputMonthFormat);
 				}
 			} else if (inputMonthFormat.length() == 4) {
 				debugPrint("Checking Month at all indices");
 				String tempMonth = monthExtracter(dateNonDelimiter);
-				monthReturned = monthValidator(tempMonth, dateFormatNonDelimiter);
+				monthReturned = monthValidator(tempMonth, inputMonthFormat);
 			}
 		}
 		debugPrint("Month detected: " + monthReturned);
@@ -292,28 +301,29 @@ public class ValidatorFormatter implements ValidateFormat {
 		if (YEAR_FORMATS.containsKey(inputYearFormat)) {
 			if (inputYearIndex == '1') {
 				debugPrint("Checking Year at index 1");
-				yearReturned = yearValidator(dateNonDelimiter.substring(0, inputYearFormat.length()));
+				yearReturned = yearValidator(dateNonDelimiter.substring(0, inputYearFormat.length()), inputYearFormat);
 				System.out.println(yearReturned);
 			} else if (inputYearIndex == '2' && inputDayIndex == '1') {
 				debugPrint("Checking Year at index 2");
 				yearReturned = yearValidator(dateNonDelimiter.substring(inputDayFormat.length(),
-						inputDayFormat.length() + inputYearFormat.length()));
+						inputDayFormat.length() + inputYearFormat.length()), inputYearFormat);
 			} else if (inputYearIndex == '2' && inputMonthIndex == '1' && inputMonthFormat.length() != 4) {
 				debugPrint("Checking Year at index 2");
 				yearReturned = yearValidator(dateNonDelimiter.substring(inputMonthFormat.length(),
-						inputMonthFormat.length() + inputYearFormat.length()));
+						inputMonthFormat.length() + inputYearFormat.length()), inputYearFormat);
 			} else if (inputYearIndex == '2' && inputMonthIndex == '1' && inputMonthFormat.length() == 4) {
 				debugPrint("Checking Year at index 2");
 				yearReturned = yearValidator(dateNonDelimiter.substring(monthReturned.length(),
-						monthReturned.length() + inputYearFormat.length()));
+						monthReturned.length() + inputYearFormat.length()), inputYearFormat);
 			} else if (inputYearIndex == '3' && inputMonthFormat.length() != 4) {
 				debugPrint("Checking Year at index 3");
 				yearReturned = yearValidator(dateNonDelimiter
-						.substring(inputDayFormat.length() + inputMonthFormat.length(), dateNonDelimiter.length()));
+						.substring(inputDayFormat.length() + inputMonthFormat.length(), dateNonDelimiter.length()),
+						inputYearFormat);
 			} else if (inputYearIndex == '3' && inputMonthFormat.length() == 4) {
 				debugPrint("Checking Year at index 3");
-				yearReturned = yearValidator(dateNonDelimiter
-						.substring(inputDayFormat.length() + monthReturned.length(), dateNonDelimiter.length()));
+				yearReturned = yearValidator(dateNonDelimiter.substring(
+						inputDayFormat.length() + monthReturned.length(), dateNonDelimiter.length()), inputYearFormat);
 			}
 		}
 		debugPrint("Year detected: " + yearReturned);
@@ -354,7 +364,7 @@ public class ValidatorFormatter implements ValidateFormat {
 								monthReturned.length() + inputDayFormat.length()),
 						MONTH_MAP.get(monthReturned), Integer.parseInt(yearReturned));
 			}
-			// Day is last index
+			// Last index is day
 			else if (inputDayIndex == '3' && inputMonthFormat.length() != 4) {
 				debugPrint("Checking Day at index 3");
 				dayReturned = dayValidator(
@@ -380,9 +390,7 @@ public class ValidatorFormatter implements ValidateFormat {
 
 		// Date validations done so setting date valid as true
 		vr.setIsValidDate(true);
-		if (formatDelimiter.equals(sbDateDelimiter.toString()))
-
-		{
+		if (formatDelimiter.equals(sbDateDelimiter.toString())) {
 			vr.setMessage("INFO: Date validated successfully.");
 		} else {
 			vr.setMessage("ERROR: Date valid but seperators do not match.");
@@ -393,17 +401,15 @@ public class ValidatorFormatter implements ValidateFormat {
 	// Private functions
 
 	private String dayValidator(String day, int month, int year) {
-
 		debugPrint("Day validator called.");
-		// Check if day values are numeric
-		for (int i = 0; i < day.length(); i++) {
-			if (!NUM_CHECK.containsKey(day.charAt(i))) {
-				debugPrint("Day validation failed.");
-				return "false";
-			}
-		}
 
-		int iDay = Integer.parseInt(day);
+		int iDay = 0;
+		try {
+			iDay = Integer.parseInt(day);
+		} catch (Exception e) {
+			debugPrint("Day validation failed.");
+			return "false";
+		}
 
 		if (month == 2 && year % 4 == 0 && iDay > 0 && iDay < 30) {
 		} else if (month == 2 && year % 4 != 0 && iDay > 0 && iDay < 29) {
@@ -422,14 +428,13 @@ public class ValidatorFormatter implements ValidateFormat {
 		return day;
 	}
 
-	private String monthValidator(String month, String dateFormatNonDelimiter) {
+	private String monthValidator(String month, String inputMonthFormat) {
 
 		debugPrint("String Month validator called.");
-		if (dateFormatNonDelimiter.toUpperCase().contains("MMMM") && MONTH_MAP.containsKey(month.toUpperCase())) {
+		if (inputMonthFormat.equals("MMMM") && MONTH_MAP.containsKey(month.toUpperCase())) {
 			debugPrint("Month validated successfully.");
 			return month.toUpperCase();
-		} else if (dateFormatNonDelimiter.toUpperCase().contains("MMM")
-				&& !dateFormatNonDelimiter.toUpperCase().contains("MMMM")) {
+		} else if (inputMonthFormat.equals("MMM")) {
 			for (String s : MONTH_MAP.keySet()) {
 				if (s.substring(0, 3).equals(month.toUpperCase())) {
 					debugPrint("Month validated successfully.");
@@ -440,13 +445,15 @@ public class ValidatorFormatter implements ValidateFormat {
 		// Check if month values are numeric
 		else {
 			debugPrint("Numeric Month validator called.");
-			for (int i = 0; i < month.length(); i++) {
-				if (!NUM_CHECK.containsKey(month.charAt(i))) {
-					debugPrint("Month validation failed.");
-					return "false";
-				}
+
+			int iMonth = 0;
+			try {
+				iMonth = Integer.parseInt(month);
+			} catch (Exception e) {
+				debugPrint("Month validation failed.");
+				return "false";
 			}
-			if (Integer.parseInt(month) < 13 && Integer.parseInt(month) > 0) {
+			if (iMonth < 13 && iMonth > 0) {
 				debugPrint("Month validated successfully.");
 				for (Map.Entry<String, Integer> e : MONTH_MAP.entrySet()) {
 					if (e.getValue() == Integer.parseInt(month))
@@ -458,21 +465,30 @@ public class ValidatorFormatter implements ValidateFormat {
 		return "false";
 	}
 
-	private String yearValidator(String year) {
+	private String yearValidator(String year, String inputYearFormat) {
 
 		debugPrint("Year validator called.");
-		// Check if year values are numeric
-		for (int i = 0; i < year.length(); i++) {
-			if (!NUM_CHECK.containsKey(year.charAt(i))) {
-				debugPrint("Year validation failed.");
-				return "false";
-			}
+
+		if (inputYearFormat.length() != year.length()) {
+			debugPrint("Year validation failed.");
+			return "false";
 		}
-		if (Integer.parseInt(year) < 9999 && Integer.parseInt(year) > 1000) {
-		} else if (year.length() == 2 && Integer.parseInt(year) < 50) {
+
+		// Check if year values are numeric
+		int iYear = 0;
+
+		try {
+			iYear = Integer.parseInt(year);
+		} catch (Exception e) {
+			debugPrint("Year validation failed.");
+			return "false";
+		}
+
+		if (iYear < 9999 && iYear > 1000) {
+		} else if (year.length() == 2 && iYear < 50) {
 			debugPrint("Appending 20 as prefix to the year.");
 			year = "20" + year;
-		} else if (year.length() == 2 && Integer.parseInt(year) > 50) {
+		} else if (year.length() == 2 && iYear > 50) {
 			debugPrint("Appending 19 as prefix to the year.");
 			year = "19" + year;
 		} else {
@@ -488,7 +504,9 @@ public class ValidatorFormatter implements ValidateFormat {
 
 		StringBuilder sbMonth = new StringBuilder();
 		for (int s = 0; s < dateNonDelimiter.length(); s++) {
-			if (!NUM_CHECK.containsKey(dateNonDelimiter.charAt(s))) {
+			if ((int) dateNonDelimiter.charAt(s) > 96 && (int) dateNonDelimiter.charAt(s) < 123) {
+				sbMonth.append(dateNonDelimiter.charAt(s));
+			} else if ((int) dateNonDelimiter.charAt(s) > 64 && (int) dateNonDelimiter.charAt(s) < 91) {
 				sbMonth.append(dateNonDelimiter.charAt(s));
 			}
 		}
@@ -607,6 +625,31 @@ public class ValidatorFormatter implements ValidateFormat {
 	private void debugPrint(String message) {
 		if (DEBUG_MODE == '1') {
 			System.out.println(message);
+		}
+	}
+
+	private int monthType(String month) {
+		// Check in MONTH_31
+		for (int i = 0; i < MONTH_31.length; i++) {
+			if (month.equals(MONTH_31[i])) {
+				debugPrint("Month type is: 31");
+				return 31;
+			}
+		}
+		// Check in MONTH_30
+		for (int i = 0; i < MONTH_30.length; i++) {
+			if (month.equals(MONTH_30[i])) {
+				debugPrint("Month type is: 30");
+				return 30;
+			}
+		}
+		// Check for Feburary
+		if (month.equals(MONTH_02)) {
+			debugPrint("Month type is: 2");
+			return 2;
+		} else {
+			debugPrint("Invalid month");
+			return 0;
 		}
 	}
 }
